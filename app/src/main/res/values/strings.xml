@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Diplom</string>
+    <string name="login_error">Не удалось авторизироваться</string>
+    <string name="auth_title">Finder</string>
 </resources>

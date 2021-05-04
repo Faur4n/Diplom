@@ -5,7 +5,7 @@ sealed class Nav(
     val route: String,
 ) {
     object Auth : Nav(Screen.Auth.route, "auth_nav")
-    object Loading : Nav(Screen.Loading.route, "loading_nav")
+    object Splash : Nav(Screen.Loading.route, "splash_nav")
     object Main : Nav(Screen.HomeScreen.route, "main_nav")
 }
 
