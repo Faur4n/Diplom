@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "287795385254",
+    "project_id": "diplom-53078",
+    "storage_bucket": "diplom-53078.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:287795385254:android:a7c57769d415e39509b567",
+        "android_client_info": {
+          "package_name": "com.fauran.diplom"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "287795385254-20n9hdn9s5ttut6762cnj2c485f2il31.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.fauran.diplom",
+            "certificate_hash": "f7d296cd4a3b41f317275a2d51e1d8336ef89594"
+          }
+        },
+        {
+          "client_id": "287795385254-2askkpq9ffkpv4hc8v9sn3nont31sa54.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCPriXG2NH4Dc4z6exRjALu4RnFLACZ9f4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "287795385254-2askkpq9ffkpv4hc8v9sn3nont31sa54.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
