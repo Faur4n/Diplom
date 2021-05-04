@@ -13,13 +13,12 @@ private val DarkColorPalette = darkColors(
 )
 
 private val LightColorPalette = lightColors(
-    primary = Purple500,
-    primaryVariant = Purple700,
-    secondary = Teal200
-
+    primary = primary,
+    primaryVariant = primaryDark,
+    secondary = accent,
+    background = backgroundGray,
+    surface = background,
     /* Other default colors to override
-    background = Color.White,
-    surface = Color.White,
     onPrimary = Color.White,
     onSecondary = Color.Black,
     onBackground = Color.Black,
@@ -29,11 +28,13 @@ private val LightColorPalette = lightColors(
 
 @Composable
 fun DiplomTheme(darkTheme: Boolean = isSystemInDarkTheme(), content: @Composable() () -> Unit) {
-    val colors = if (darkTheme) {
-        DarkColorPalette
-    } else {
-        LightColorPalette
-    }
+    val colors = LightColorPalette
+    //TODO ADD DARK COLOR PALLET
+//    if (darkTheme) {
+//        DarkColorPalette
+//    } else {
+//        LightColorPalette
+//    }
 
     MaterialTheme(
         colors = colors,
