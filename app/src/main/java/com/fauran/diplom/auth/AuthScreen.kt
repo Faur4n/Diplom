@@ -4,10 +4,7 @@ import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.rememberScaffoldState
@@ -22,17 +19,23 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.navigate
 import androidx.navigation.compose.popUpTo
 import com.fauran.diplom.R
 import com.fauran.diplom.auth.widgets.GoogleSignInButton
+import com.fauran.diplom.auth.widgets.SpotifySignInButton
 import com.fauran.diplom.navigation.LocalRootNavController
 import com.fauran.diplom.navigation.Nav
 import com.fauran.diplom.ui.theme.Purple200
 import com.fauran.diplom.ui.theme.Purple500
 import com.fauran.diplom.ui.theme.Purple700
 import com.fauran.diplom.ui.theme.Typography
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.launch
 import java.util.*
 
@@ -97,11 +100,9 @@ fun AuthScreen(viewModel: AuthViewModel) {
                         translationY = -translation.value,
                         alpha = alpha.value
                     )
-
             ) {
                 Text(
-                    text = stringResource(id = R.string.auth_title)
-                        .capitalize(Locale.getDefault()),
+                    text = stringResource(id = R.string.auth_title).toUpperCase(Locale.getDefault()),
                     style = Typography.h3,
                     color = Color.White,
                     modifier = Modifier.align(Alignment.CenterHorizontally)
@@ -115,20 +116,25 @@ fun AuthScreen(viewModel: AuthViewModel) {
             }
             Column(
                 modifier = Modifier
-                    .weight(2f)
+                    .weight(1f)
+                    .fillMaxWidth()
                     .graphicsLayer(
                         translationY = translation.value,
                         alpha = alpha.value
                     )
             ) {
-                Box(modifier = Modifier.fillMaxSize()) {
                     GoogleSignInButton(
-                        Modifier.align(Alignment.Center),
+                        Modifier.align(Alignment.CenterHorizontally),
+                        onSuccess = onSuccess,
+                        onError = onError
+                    )
+                    Spacer(modifier = Modifier.size(16.dp))
+                    SpotifySignInButton(
+                        Modifier.align(Alignment.CenterHorizontally),
                         onSuccess = onSuccess,
                         onError = onError
                     )
                 }
-            }
         }
     }
 }

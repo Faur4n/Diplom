@@ -1,4 +1,4 @@
-package com.fauran.diplom.util
+package com.fauran.diplom.auth.contracts
 
 import android.content.Context
 import android.content.Intent
@@ -11,7 +11,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 
-class GoogleSignInContract(private val context: Context) : ActivityResultContract<Int, GoogleSignInAccount?>() {
+class GoogleSignInContract : ActivityResultContract<Int, GoogleSignInAccount?>() {
 
     private val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
         .requestIdToken(
