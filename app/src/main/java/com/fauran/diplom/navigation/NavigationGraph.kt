@@ -20,10 +20,12 @@ import com.fauran.diplom.auth.AuthGraph
 import com.fauran.diplom.main.MainGraph
 import com.fauran.diplom.splash.SplashScreen
 import com.fauran.diplom.splash.SplashViewModel
+import com.google.accompanist.pager.ExperimentalPagerApi
 import kotlinx.coroutines.delay
 
 val LocalRootNavController = staticCompositionLocalOf<NavController?> { null }
 
+@ExperimentalPagerApi
 @Composable
 fun Navigation(){
     val navController = rememberNavController()

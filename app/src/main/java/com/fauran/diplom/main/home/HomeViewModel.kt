@@ -6,15 +6,25 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.NavController
+import androidx.navigation.compose.navigate
+import androidx.navigation.compose.popUpTo
 import com.fauran.diplom.TAG
 import com.fauran.diplom.local.Preferences.FirebaseToken
 import com.fauran.diplom.local.Preferences.SpotifyToken
 import com.fauran.diplom.local.Preferences.updatePreferences
+import com.fauran.diplom.models.SpotifyImage
+import com.fauran.diplom.models.User
+import com.fauran.diplom.navigation.Nav
+import com.fauran.diplom.network.SpotifyApi
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.PropertyName
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.firestore.ktx.toObjects
 import com.google.firebase.ktx.Firebase
+import com.skydoves.sandwich.getOrNull
+import com.skydoves.sandwich.getOrThrow
+import com.skydoves.sandwich.onSuccess
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
@@ -24,32 +34,21 @@ import javax.inject.Inject
 sealed class HomeStatus {
     object Loading : HomeStatus()
     object FirstLaunch : HomeStatus()
-    object Data : HomeStatus()
+    data class Data(val user: User) : HomeStatus()
     object NotAuthorized : HomeStatus()
 }
 
-data class User(
-    @get:PropertyName("gkey")
-    @set:PropertyName("gkey")
-    var gkey: String? = null,
-    @get:PropertyName("email")
-    @set:PropertyName("email")
-    var email: String? = null,
-    @get:PropertyName("photo_url")
-    @set:PropertyName("photo_url")
-    var photoUrl: String? = null,
-    @get:PropertyName("name")
-    @set:PropertyName("name")
-    var name: String? = null
-)
 
 @HiltViewModel
-class HomeViewModel @Inject constructor() : ViewModel() {
+class HomeViewModel @Inject constructor(
+    private val spotifyApi : SpotifyApi
+) : ViewModel() {
 
     private val _status = MutableLiveData<HomeStatus>(HomeStatus.Loading)
     val status: LiveData<HomeStatus> = _status
     private val db = Firebase.firestore
     private val auth = Firebase.auth
+    val isSpotifyUser = auth.currentUser?.uid?.startsWith("spotify") == true
 
     init {
         isFirstLaunch()
@@ -64,12 +63,12 @@ class HomeViewModel @Inject constructor() : ViewModel() {
                 return@launch
             }
             val user =
-                db.collection("users/").whereEqualTo("gkey", uuid).get().await().toObjects<User>()
-            if (user.isEmpty()) {
+                db.collection("users/").whereEqualTo("gkey", uuid).get().await().toObjects<User>().firstOrNull()
+            if (user == null) {
                 _status.postValue(HomeStatus.FirstLaunch)
                 createUserOnFirstLaunch(uuid)
             } else {
-                _status.postValue(HomeStatus.Data)
+                _status.postValue(HomeStatus.Data(user))
             }
         }
     }
@@ -78,12 +77,19 @@ class HomeViewModel @Inject constructor() : ViewModel() {
         val email = auth.currentUser?.email
         val displayName = auth.currentUser?.displayName
         val photo = "https:${auth.currentUser?.photoUrl?.encodedSchemeSpecificPart}"
+        Log.d(TAG, "createUserOnFirstLaunch: $isSpotifyUser")
+        val musicData = if(isSpotifyUser){
+            spotifyApi.getTopArtists().getOrNull()?.items?.map { it.mapToData() }
+        }else{
+            null
+        }
 
         val user = User(
             gkey = uuid,
             email = email,
             photoUrl = photo,
-            name = displayName
+            name = displayName,
+            music = musicData
         )
         kotlin.runCatching {
             db.collection("/users")
@@ -91,19 +97,23 @@ class HomeViewModel @Inject constructor() : ViewModel() {
                 .set(user)
                 .await()
         }.onFailure {
+            Log.d(TAG, "createUserOnFirstLaunch: ${it.message} $it")
             _status.postValue(HomeStatus.NotAuthorized)
         }.onSuccess {
-            _status.postValue(HomeStatus.Data)
+            _status.postValue(HomeStatus.Data(user))
         }
     }
 
-    fun logout(context: Context) {
+    fun logout(context: Context,navController: NavController?) {
         viewModelScope.launch {
-            val isSpotifyUser = auth.currentUser?.uid?.startsWith("spotify") == true
             context.updatePreferences(SpotifyToken,"")
             context.updatePreferences(FirebaseToken,"")
             Firebase.auth.signOut()
-            _status.postValue(HomeStatus.NotAuthorized)
+            navController?.navigate(Nav.Auth.route) {
+                popUpTo(Nav.Main.route) {
+                    inclusive = true
+                }
+            }
         }
     }
 }

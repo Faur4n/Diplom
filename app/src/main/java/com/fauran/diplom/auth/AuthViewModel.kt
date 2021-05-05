@@ -100,6 +100,7 @@ class AuthViewModel @Inject constructor(
             sendError("Empty spotify token")
             return
         }
+        Log.d(TAG, "authWithSpotifyToken: SPOTIFY TOKEN $token")
         viewModelScope.launch {
             saveSpotifyToken(context, token)
             spotifyApi.getMe().suspendOnSuccess {

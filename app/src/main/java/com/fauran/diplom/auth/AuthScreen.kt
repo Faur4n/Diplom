@@ -110,13 +110,7 @@ fun AuthScreen(viewModel: AuthViewModel) {
         Column(
             modifier = Modifier
                 .background(
-                    brush = Brush.verticalGradient(
-                        colors = listOf(
-                            Purple200,
-                            Purple500,
-                            Purple700
-                        )
-                    )
+                    brush = PurpleGradient
                 )
                 .clipToBounds()
                 .padding(8.dp)

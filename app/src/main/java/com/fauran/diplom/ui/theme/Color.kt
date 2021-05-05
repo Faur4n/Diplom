@@ -1,11 +1,56 @@
 package com.fauran.diplom.ui.theme
 
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 
 val Purple200 = Color(0xFFBB86FC)
 val Purple500 = Color(0xFF6200EE)
 val Purple700 = Color(0xFF3700B3)
-val Teal200 = Color(0xFF03DAC5)
+
+val Teal200 = Color(0xFFc3fdff)
+val Teal500 = Color(0xFF90caf9)
+val Teal700 = Color(0xFF5d99c6)
+
+val Green200 = Color(0xFF98ee99)
+val Green500 = Color(0xFF66bb6a)
+val Green700 = Color(0xFF338a3e)
+
+val PurpleGradient = Brush.verticalGradient(
+    colors = listOf(
+        Purple200,
+        Purple500,
+        Purple700
+    )
+)
+
+val purples = listOf(
+    Purple200,
+    Purple500,
+    Purple700
+)
+
+val teals = listOf(
+    Teal200,
+    Teal500,
+    Teal700
+)
+
+val greens = listOf(
+    Green200,
+    Green500,
+    Green700
+)
+
+val TealGradient = Brush.verticalGradient(
+    colors = listOf(
+        Teal200,
+        Teal500,
+        Teal700
+    )
+)
+
+
+
 
 val primary = Color(0xFF7b1fa2)
 val primaryDark = Color(0xFF4a0072)

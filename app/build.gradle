@@ -83,9 +83,12 @@ dependencies {
     implementation "com.google.dagger:hilt-android:$hilt_version"
     kapt "com.google.dagger:hilt-compiler:$hilt_version"
 
+    def accompanistVersion = "0.8.1"
     //ACCOMPANIST
-    implementation 'com.google.accompanist:accompanist-coil:0.8.1'
-    implementation 'com.google.accompanist:accompanist-pager:0.8.1'
+    implementation "com.google.accompanist:accompanist-coil:$accompanistVersion"
+    implementation "com.google.accompanist:accompanist-pager:$accompanistVersion"
+    implementation "com.google.accompanist:accompanist-pager-indicators:$accompanistVersion"
+    implementation "com.google.accompanist:accompanist-flowlayout:$accompanistVersion"
 
     //Firebase
     implementation platform('com.google.firebase:firebase-bom:27.1.0')

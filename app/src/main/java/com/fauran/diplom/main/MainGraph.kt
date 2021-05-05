@@ -18,9 +18,11 @@ import androidx.navigation.compose.rememberNavController
 import com.fauran.diplom.main.home.HomeScreen
 import com.fauran.diplom.main.home.HomeViewModel
 import com.fauran.diplom.navigation.Screen
+import com.google.accompanist.pager.ExperimentalPagerApi
 
 val LocalMainNavController = staticCompositionLocalOf<NavController?>{ null }
 
+@ExperimentalPagerApi
 @Composable
 fun MainGraph(){
     val navController = rememberNavController()

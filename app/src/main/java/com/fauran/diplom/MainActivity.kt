@@ -9,6 +9,7 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import com.fauran.diplom.ui.theme.DiplomTheme
 import dagger.hilt.android.AndroidEntryPoint
 import com.fauran.diplom.navigation.*
+import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
@@ -19,6 +20,7 @@ val LocalGoogleSignInClient = staticCompositionLocalOf<GoogleSignInClient?> { nu
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+    @ExperimentalPagerApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
