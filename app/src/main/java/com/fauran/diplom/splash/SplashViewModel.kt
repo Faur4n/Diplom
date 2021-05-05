@@ -11,7 +11,7 @@ class SplashViewModel @Inject constructor() : ViewModel(){
 
     suspend fun userIsAuthorized(
     ) : Boolean{
-        return false
+//        return false
         return FirebaseAuth.getInstance().currentUser != null
     }
 }

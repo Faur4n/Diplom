@@ -3,9 +3,11 @@ package com.fauran.diplom
 import android.content.Context
 import com.fauran.diplom.network.SpotifyApi
 import com.fauran.diplom.network.SpotifyApiService
+import com.fauran.diplom.network.SpotifyAuthInterceptor
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.readystatesoftware.chuck.ChuckInterceptor
+import com.skydoves.sandwich.coroutines.CoroutinesResponseCallAdapterFactory
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -21,35 +23,32 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object AppModule {
-    private const val SPOTIFY_BASE_URL = "https://api.spotify.com/v1"
+    private const val SPOTIFY_BASE_URL = "https://api.spotify.com/v1/"
 
 
-    @ActivityRetainedScoped
+    @Singleton
     @Provides
     fun provideRetrofit(
         gson: Gson,
-//        authInterceptor: AuthInterceptor,
+        authInterceptor: SpotifyAuthInterceptor,
         @ApplicationContext context: Context
     ): Retrofit {
         val loggingInterceptor = HttpLoggingInterceptor()
         loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY)
         val clientBuilder = OkHttpClient.Builder()
             .addInterceptor(loggingInterceptor)
-//            .addInterceptor(authInterceptor)
+            .addInterceptor(authInterceptor)
 
         if (BuildConfig.DEBUG)
             clientBuilder
                 .addInterceptor(ChuckInterceptor(context))
-
-//        val moshi = Moshi.Builder()
-//            .addLast(KotlinJsonAdapterFactory())
-//            .build()
 
         val builder = Retrofit.Builder()
             .baseUrl(SPOTIFY_BASE_URL)
             .addConverterFactory(
                 GsonConverterFactory.create(gson)
             )
+            .addCallAdapterFactory(CoroutinesResponseCallAdapterFactory())
             .client(clientBuilder.build())
 
         return builder.build()
@@ -70,5 +69,8 @@ object AppModule {
     @Singleton
     fun provideSpotifyApi(api : SpotifyApiService) = SpotifyApi(api)
 
-
+    @Provides
+    @Singleton
+    fun provideSpotifyAuthInterceptor(@ApplicationContext context: Context) : SpotifyAuthInterceptor =
+        SpotifyAuthInterceptor(context)
 }

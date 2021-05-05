@@ -1,9 +1,7 @@
 package com.fauran.diplom.auth.widgets
 
-import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
@@ -19,27 +17,28 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.fauran.diplom.R
 import com.fauran.diplom.SPOTIFY_SIGN_IN
-import com.fauran.diplom.TAG
+import com.fauran.diplom.auth.AuthViewModel
+import com.fauran.diplom.auth.contracts.SpotifySignInContract
 import com.fauran.diplom.ui.theme.googleText
 import com.fauran.diplom.ui.theme.spotifyBlack
 import com.fauran.diplom.ui.theme.spotifyGreen
-import com.fauran.diplom.auth.contracts.SpotifySignInContract
+import com.spotify.sdk.android.authentication.AuthenticationResponse
 
 
 @Composable
 fun SpotifySignInButton(
     modifier: Modifier,
-    onSuccess: () -> Unit,
-    onError: () -> Unit
+    onResult: (AuthenticationResponse?) -> Unit,
+    onStart : () -> Unit,
 ) {
-    val context = LocalContext.current
-    val launcher = rememberLauncherForActivityResult(SpotifySignInContract()) { authResponse ->
-
+    val launcher = rememberLauncherForActivityResult(SpotifySignInContract()) { response ->
+        onResult(response)
     }
     Card(
         backgroundColor = spotifyBlack,
         modifier = modifier
             .clickable {
+                onStart()
                 launcher.launch(SPOTIFY_SIGN_IN)
             }) {
         Row(

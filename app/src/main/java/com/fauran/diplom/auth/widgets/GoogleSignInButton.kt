@@ -21,6 +21,7 @@ import com.fauran.diplom.R
 import com.fauran.diplom.TAG
 import com.fauran.diplom.ui.theme.googleText
 import com.fauran.diplom.auth.contracts.GoogleSignInContract
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 
@@ -28,29 +29,18 @@ import com.google.firebase.auth.GoogleAuthProvider
 @Composable
 fun GoogleSignInButton(
     modifier: Modifier,
-    onSuccess: () -> Unit,
-    onError: () -> Unit
-) {
+    onResult: (GoogleSignInAccount?) -> Unit,
+    onStart : () -> Unit,
+
+    ) {
     val context = LocalContext.current
     val launcher = rememberLauncherForActivityResult(GoogleSignInContract()) { account ->
-        val token = account?.idToken
-        when {
-            account == null || token == null -> {
-                onError()
-            }
-            else -> {
-                val credential = GoogleAuthProvider.getCredential(token, null)
-                FirebaseAuth.getInstance().signInWithCredential(credential).addOnSuccessListener {
-                    onSuccess()
-                }.addOnFailureListener {
-                    onError()
-                }
-            }
-        }
+       onResult(account)
     }
     Card(
         modifier = modifier
             .clickable {
+                onStart()
                 launcher.launch(GOOGLE_SIGN_IN)
             }) {
         Row(

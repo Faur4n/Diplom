@@ -10,10 +10,13 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.focusModifier
+import androidx.hilt.navigation.compose.hiltNavGraphViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.fauran.diplom.main.home.HomeScreen
+import com.fauran.diplom.main.home.HomeViewModel
 import com.fauran.diplom.navigation.Screen
 
 val LocalMainNavController = staticCompositionLocalOf<NavController?>{ null }
@@ -26,11 +29,8 @@ fun MainGraph(){
     ) {
         NavHost(navController = navController, startDestination = Screen.HomeScreen.route){
             composable(Screen.HomeScreen.route){
-                Scaffold() {
-                    Box(modifier = Modifier.fillMaxSize()){
-                        Text(text = "THIS IS HOME SCREEN",Modifier.align(Alignment.Center))
-                    }
-                }
+                val viewModel : HomeViewModel = hiltNavGraphViewModel()
+                HomeScreen(viewModel = viewModel)
             }
         }
     }

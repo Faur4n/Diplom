@@ -48,18 +48,8 @@ class SpotifySignInContract : ActivityResultContract<Int, AuthenticationResponse
 
 
     override fun parseResult(resultCode: Int, result: Intent?): AuthenticationResponse? {
-        val response = AuthenticationClient.getResponse(resultCode, result)
-        when(response.type){
-            AuthenticationResponse.Type.TOKEN ->{
-                Log.d(TAG, "parseResult: SUCCESS ${response.accessToken} ${response.type}")
-            }
-            AuthenticationResponse.Type.ERROR ->{
-                Log.d(TAG, "parseResult: ERROR RETURN NULL  code ${response.code} error ${response.error}")
-            }
-        }
-        Log.d(TAG, "parseResult: $response")
 
-        return response
+        return AuthenticationClient.getResponse(resultCode, result)
     }
 
     private fun getMe(token: String){

@@ -92,6 +92,8 @@ dependencies {
     implementation 'com.google.firebase:firebase-analytics-ktx'
     implementation 'com.google.firebase:firebase-auth-ktx'
     implementation 'com.google.firebase:firebase-functions-ktx'
+    implementation 'com.google.firebase:firebase-firestore-ktx'
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.3.9"
 
     //GMS
     implementation 'com.google.android.gms:play-services-auth:19.0.0'
@@ -110,5 +112,10 @@ dependencies {
 
     //RESPONSE HANDLING
     implementation "com.github.skydoves:sandwich:1.1.0"
+
+    //DATA STORE
+    implementation "androidx.datastore:datastore-preferences:1.0.0-beta01"
+
+    implementation "com.airbnb.android:lottie-compose:1.0.0-beta03-1"
 
 }
