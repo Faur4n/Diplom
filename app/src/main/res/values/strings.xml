@@ -7,5 +7,6 @@
     <string name="com_spotify_sdk_redirect_scheme">fauran</string>
     <string name="com_spotify_sdk_redirect_host">diplom</string>
     <string name="no_name">Без имени</string>
-    <string name="music_title">Музыка</string>
+    <string name="music_title">Музыка которая может вам понравится</string>
+    <string name="genres_title">Ваши любимые жанры</string>
 </resources>

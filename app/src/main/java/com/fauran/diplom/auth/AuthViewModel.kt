@@ -11,6 +11,7 @@ import com.fauran.diplom.local.Preferences
 import com.fauran.diplom.local.Preferences.updatePreferences
 import com.fauran.diplom.models.SpotifyMe
 import com.fauran.diplom.network.SpotifyApi
+import com.fauran.diplom.util.saveSpotifyToken
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
@@ -45,9 +46,6 @@ class AuthViewModel @Inject constructor(
     private val _signedIn = MutableLiveData<AuthStatus>(AuthStatus.NotAuthorized)
     val signedIn: LiveData<AuthStatus> = _signedIn
 
-    private suspend fun saveSpotifyToken(context: Context, token: String) {
-        context.updatePreferences(Preferences.SpotifyToken, token)
-    }
 
     private suspend fun getFirebaseToken(me: SpotifyMe, accessToken: String, context: Context) {
         val data = hashMapOf(

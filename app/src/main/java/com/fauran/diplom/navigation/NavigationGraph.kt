@@ -1,5 +1,6 @@
 package com.fauran.diplom.navigation
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.CircularProgressIndicator
@@ -25,6 +26,7 @@ import kotlinx.coroutines.delay
 
 val LocalRootNavController = staticCompositionLocalOf<NavController?> { null }
 
+@ExperimentalFoundationApi
 @ExperimentalPagerApi
 @Composable
 fun Navigation(){

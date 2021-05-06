@@ -74,6 +74,7 @@ dependencies {
     implementation "androidx.compose.animation:animation:$compose_version"
     implementation "androidx.compose.runtime:runtime-livedata:$compose_version"
     implementation "androidx.compose.material:material-icons-core:$compose_version"
+    implementation "androidx.compose.material:material-icons-extended:$compose_version"
 
     //NAVIGATION
     implementation "androidx.navigation:navigation-compose:1.0.0-alpha10"
@@ -89,6 +90,7 @@ dependencies {
     implementation "com.google.accompanist:accompanist-pager:$accompanistVersion"
     implementation "com.google.accompanist:accompanist-pager-indicators:$accompanistVersion"
     implementation "com.google.accompanist:accompanist-flowlayout:$accompanistVersion"
+    implementation "com.google.accompanist:accompanist-systemuicontroller:$accompanistVersion"
 
     //Firebase
     implementation platform('com.google.firebase:firebase-bom:27.1.0')

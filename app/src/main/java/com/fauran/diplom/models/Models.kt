@@ -2,6 +2,8 @@ package com.fauran.diplom.models
 
 import androidx.annotation.StringRes
 import com.fauran.diplom.R
+import com.fauran.diplom.main.home.BaseSection
+import com.fauran.diplom.main.home.Section
 import com.google.firebase.firestore.PropertyName
 import com.google.gson.annotations.SerializedName
 
@@ -40,7 +42,30 @@ data class User(
     @get:PropertyName("music")
     @set:PropertyName("music")
     var music: List<MusicData>? = null,
+    @get:PropertyName("accounts")
+    @set:PropertyName("accounts")
+    var accounts : List<Account>?  = null
 )
+
+const val ACC_TYPE_SPOTIFY = "spotify"
+data class Account(
+    @get:PropertyName("type")
+    @set:PropertyName("type")
+    var type: String? = null,
+    @get:PropertyName("name")
+    @set:PropertyName("name")
+    var name: String? = null,
+    @get:PropertyName("token")
+    @set:PropertyName("token")
+    var token : String? = null,
+    @get:PropertyName("email")
+    @set:PropertyName("email")
+    var email: String? = null,
+    @get:PropertyName("photoUrl")
+    @set:PropertyName("photoUrl")
+    var photoUrl: String? =null
+)
+
 
 data class MusicData(
     @get:PropertyName("genres")
@@ -52,9 +77,8 @@ data class MusicData(
     @get:PropertyName("image_url")
     @set:PropertyName("image_url")
     var imageUrl : String? = null,
-) : PageData()
+) : BaseSection()
 
-abstract class PageData()
 
 data class SpotifyTopArtistsResponse(
     val items : List<SpotifyTopArtistsItem>? = null

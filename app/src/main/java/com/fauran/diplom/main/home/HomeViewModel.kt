@@ -13,18 +13,19 @@ import com.fauran.diplom.TAG
 import com.fauran.diplom.local.Preferences.FirebaseToken
 import com.fauran.diplom.local.Preferences.SpotifyToken
 import com.fauran.diplom.local.Preferences.updatePreferences
-import com.fauran.diplom.models.SpotifyImage
-import com.fauran.diplom.models.User
+import com.fauran.diplom.models.*
 import com.fauran.diplom.navigation.Nav
 import com.fauran.diplom.network.SpotifyApi
+import com.fauran.diplom.util.saveSpotifyToken
 import com.google.firebase.auth.ktx.auth
-import com.google.firebase.firestore.PropertyName
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.firestore.ktx.toObjects
 import com.google.firebase.ktx.Firebase
 import com.skydoves.sandwich.getOrNull
-import com.skydoves.sandwich.getOrThrow
-import com.skydoves.sandwich.onSuccess
+import com.skydoves.sandwich.message
+import com.skydoves.sandwich.onError
+import com.skydoves.sandwich.suspendOnSuccess
+import com.spotify.sdk.android.authentication.AuthenticationResponse
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
@@ -38,6 +39,7 @@ sealed class HomeStatus {
     object NotAuthorized : HomeStatus()
 }
 
+val isSpotifyUser get() = Firebase.auth.currentUser?.uid?.startsWith("spotify") == true
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
@@ -48,8 +50,7 @@ class HomeViewModel @Inject constructor(
     val status: LiveData<HomeStatus> = _status
     private val db = Firebase.firestore
     private val auth = Firebase.auth
-    val isSpotifyUser = auth.currentUser?.uid?.startsWith("spotify") == true
-
+    private var currentUser : User? = null
     init {
         isFirstLaunch()
     }
@@ -68,6 +69,7 @@ class HomeViewModel @Inject constructor(
                 _status.postValue(HomeStatus.FirstLaunch)
                 createUserOnFirstLaunch(uuid)
             } else {
+                currentUser = user
                 _status.postValue(HomeStatus.Data(user))
             }
         }
@@ -79,11 +81,10 @@ class HomeViewModel @Inject constructor(
         val photo = "https:${auth.currentUser?.photoUrl?.encodedSchemeSpecificPart}"
         Log.d(TAG, "createUserOnFirstLaunch: $isSpotifyUser")
         val musicData = if(isSpotifyUser){
-            spotifyApi.getTopArtists().getOrNull()?.items?.map { it.mapToData() }
+            getMusicData()
         }else{
             null
         }
-
         val user = User(
             gkey = uuid,
             email = email,
@@ -91,9 +92,18 @@ class HomeViewModel @Inject constructor(
             name = displayName,
             music = musicData
         )
+        currentUser = user
+        saveUser(user)
+    }
+
+    suspend fun getMusicData(): List<MusicData>? {
+        return spotifyApi.getTopArtists().getOrNull()?.items?.map { it.mapToData() }
+    }
+
+    private suspend fun saveUser(user: User){
         kotlin.runCatching {
             db.collection("/users")
-                .document(uuid)
+                .document(user.gkey.toString())
                 .set(user)
                 .await()
         }.onFailure {
@@ -101,6 +111,51 @@ class HomeViewModel @Inject constructor(
             _status.postValue(HomeStatus.NotAuthorized)
         }.onSuccess {
             _status.postValue(HomeStatus.Data(user))
+        }
+    }
+
+    fun connectSpotify(context: Context,response: AuthenticationResponse?) {
+        if (response == null || response.type != AuthenticationResponse.Type.TOKEN) {
+//            sendError("Bad spotify reponse")
+            return
+        }
+        val token = response.accessToken
+        if (token == null) {
+//            sendError("Empty spotify token")
+            return
+        }
+        Log.d(TAG, "authWithSpotifyToken: SPOTIFY TOKEN $token")
+        viewModelScope.launch {
+            saveSpotifyToken(context, token)
+            spotifyApi.getMe().suspendOnSuccess {
+                data?.let { me ->
+                    saveSpotifyAccount(token,me)
+                    Log.d(TAG, "authWithSpotifyToken: $me")
+                }
+            }.onError {
+                Log.d(TAG, "authWithSpotifyToken: ${this.message()}")
+            }
+        }
+    }
+
+    private suspend fun saveSpotifyAccount(token: String,me : SpotifyMe){
+        val musicData = getMusicData()
+        val curUser = currentUser
+        if(curUser != null){
+            val accs = (curUser.accounts ?: emptyList()).toMutableList()
+            val spotifyAccount = Account(
+                type = ACC_TYPE_SPOTIFY,
+                name = me.displayName,
+                token = token,
+                email = me.email,
+                photoUrl = me.href
+            )
+            accs.add(spotifyAccount)
+            val newUser = curUser.copy(
+                accounts = accs,
+                music = musicData
+            )
+            saveUser(newUser)
         }
     }
 

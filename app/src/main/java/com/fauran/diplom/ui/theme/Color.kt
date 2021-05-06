@@ -2,6 +2,7 @@ package com.fauran.diplom.ui.theme
 
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import com.fauran.diplom.main.home.colorAnimation.ThemeColor
 
 val Purple200 = Color(0xFFBB86FC)
 val Purple500 = Color(0xFF6200EE)
@@ -46,6 +47,19 @@ val TealGradient = Brush.verticalGradient(
         Teal200,
         Teal500,
         Teal700
+    )
+)
+
+val defaultThemeColor = ThemeColor(
+    Purple200,
+    Purple500,
+    Purple700,
+    Brush.verticalGradient(
+        colors = listOf(
+            Purple200,
+            Purple500,
+            Purple700,
+        )
     )
 )
 

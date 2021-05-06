@@ -27,7 +27,7 @@ import com.spotify.sdk.android.authentication.AuthenticationResponse
 
 @Composable
 fun SpotifySignInButton(
-    modifier: Modifier,
+    modifier: Modifier = Modifier,
     onResult: (AuthenticationResponse?) -> Unit,
     onStart : () -> Unit,
 ) {

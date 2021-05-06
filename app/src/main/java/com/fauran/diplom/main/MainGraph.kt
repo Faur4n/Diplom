@@ -1,5 +1,6 @@
 package com.fauran.diplom.main
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Scaffold
@@ -22,7 +23,7 @@ import com.google.accompanist.pager.ExperimentalPagerApi
 
 val LocalMainNavController = staticCompositionLocalOf<NavController?>{ null }
 
-@ExperimentalPagerApi
+@ExperimentalFoundationApi
 @Composable
 fun MainGraph(){
     val navController = rememberNavController()
