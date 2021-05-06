@@ -25,13 +25,16 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.fauran.diplom.R
 import com.fauran.diplom.auth.widgets.SpotifySignInButton
+import com.fauran.diplom.auth.widgets.VkSignInButton
 import com.fauran.diplom.main.home.AvatarImage
 import com.fauran.diplom.main.home.HomeViewModel
-import com.fauran.diplom.main.home.isSpotifyUser
 import com.fauran.diplom.models.ACC_TYPE_SPOTIFY
+import com.fauran.diplom.models.ACC_TYPE_VK
 import com.fauran.diplom.models.User
 import com.fauran.diplom.ui.theme.Green500
 import com.fauran.diplom.ui.theme.Typography
+import com.fauran.diplom.util.isSpotifyUser
+import com.fauran.diplom.util.isVkUser
 
 @Composable
 fun CardItem(
@@ -47,6 +50,15 @@ fun CardItem(
             }
         }
         mutableStateOf(isSpotifyUser || hasSpotAcc)
+    }
+    val vkConnected by remember(user) {
+        var hasVkAcc = false
+        user?.accounts?.forEach { acc ->
+            if (acc.type == ACC_TYPE_VK) {
+                hasVkAcc = true
+            }
+        }
+        mutableStateOf(isVkUser || hasVkAcc)
     }
 
     Card(
@@ -75,8 +87,13 @@ fun CardItem(
                 )
             }
             Spacer(modifier = Modifier.size(16.dp))
-            val type = if (!isSpotifyUser) "Google" else "Spotify"
-            Text(text = "Вы вошли через $type\nВойдите через другие соцсети, чтобы получать больше рекомендаций")
+            val type = when{
+                isSpotifyUser -> "Spotify"
+                isVkUser -> "VK"
+                else -> "Google"
+            }
+
+            Text(text = "Вы вошли через $type.\nВойдите через другие соцсети, чтобы получать больше рекомендаций.")
             Spacer(modifier = Modifier.size(16.dp))
             if (spotifyConnected) {
                 Row() {
@@ -99,6 +116,28 @@ fun CardItem(
                 SpotifySignInButton(onResult = {
                     viewModel.connectSpotify(context, it)
                 }, onStart = {
+
+                })
+            }
+            Spacer(modifier = Modifier.size(16.dp))
+            if (vkConnected) {
+                Row() {
+                    Row(modifier = Modifier.weight(1f)) {
+                        Image(
+                            painterResource(R.drawable.ic_vk_full_logo),
+                            contentDescription = "spotify",
+                            modifier = Modifier.height(32.dp)
+                        )
+                    }
+                    val paint = rememberVectorPainter(image = Icons.Filled.Done)
+                    Icon(painter = paint, contentDescription = "done", tint = Green500)
+                }
+            } else {
+                VkSignInButton(onResult = {
+                    viewModel.connectVk(context, it)
+                }, onStart = {
+
+                },onError = {
 
                 })
             }

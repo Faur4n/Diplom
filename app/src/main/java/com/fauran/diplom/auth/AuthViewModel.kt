@@ -9,9 +9,11 @@ import androidx.lifecycle.viewModelScope
 import com.fauran.diplom.TAG
 import com.fauran.diplom.local.Preferences
 import com.fauran.diplom.local.Preferences.updatePreferences
+import com.fauran.diplom.main.VkApi
 import com.fauran.diplom.models.SpotifyMe
 import com.fauran.diplom.network.SpotifyApi
 import com.fauran.diplom.util.saveSpotifyToken
+import com.fauran.diplom.util.saveVkToken
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
@@ -19,15 +21,21 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.functions.ktx.functions
 import com.google.firebase.ktx.Firebase
 import com.google.gson.Gson
-import com.google.gson.JsonObject
 import com.skydoves.sandwich.message
 import com.skydoves.sandwich.onError
 import com.skydoves.sandwich.suspendOnSuccess
 import com.spotify.sdk.android.authentication.AuthenticationResponse
+import com.vk.api.sdk.VK
+import com.vk.api.sdk.VKApiCallback
+import com.vk.api.sdk.auth.VKAccessToken
+import com.vk.sdk.api.users.UsersService
+import com.vk.sdk.api.users.dto.UsersFields
+import com.vk.sdk.api.users.dto.UsersUserXtrCounters
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
+import kotlin.coroutines.suspendCoroutine
 
 
 sealed class AuthStatus {
@@ -61,7 +69,8 @@ class AuthViewModel @Inject constructor(
                 .call(data)
                 .await()
             Log.d(TAG, "getFirebaseToken: $response")
-            val responseMap = gson.fromJson<Map<String,String>>(response.data.toString(), Map::class.java)
+            val responseMap =
+                gson.fromJson<Map<String, String>>(response.data.toString(), Map::class.java)
             val fbToken = responseMap["token"]
             Log.d(TAG, "getFirebaseToken: ${fbToken}")
             if (fbToken != null) {
@@ -83,7 +92,8 @@ class AuthViewModel @Inject constructor(
             sendError(it.message.toString())
         }
     }
-    fun loading(){
+
+    fun loading() {
         _signedIn.postValue(AuthStatus.Loading)
     }
 
@@ -113,6 +123,7 @@ class AuthViewModel @Inject constructor(
     }
 
     fun authWithGoogleAccount(account: GoogleSignInAccount?) {
+        Log.d(TAG, "authWithGoogleAccount: $account")
         val token = account?.idToken
         when {
             account == null || token == null -> {
@@ -129,7 +140,56 @@ class AuthViewModel @Inject constructor(
         }
     }
 
-    private fun sendError(msg: String){
+    fun authWithVkToken(context: Context, token: VKAccessToken?) {
+        if (token == null) {
+            sendError("Bad vk token")
+            return
+        }
+        val accessToken = token.accessToken
+
+        viewModelScope.launch {
+            saveVkToken(context = context, accessToken)
+            val profile = VkApi.getVkProfile(token.userId)
+            Log.d(TAG, "authWithVkToken: ${token.phone} ${token.phoneAccessKey}")
+            val email = token.email
+            val data = mutableMapOf<String,String>(
+                "phone" to token.phone.toString(),
+                "user_id" to token.userId.toString(),
+                "username" to "${profile?.firstName} ${profile?.lastName}",
+                "token" to accessToken,
+                "url" to profile?.photo200Orig.toString()
+            )
+            if(email!= null){
+                data["email"] = email
+            }
+            try {
+                val response = Firebase.functions
+                    .getHttpsCallable("vkToToken")
+                    .call(data)
+                    .await()
+                Log.d(TAG, "authWithVkToken: $response")
+                val responseMap =
+                    gson.fromJson<Map<String, String>>(response.data.toString(), Map::class.java)
+                val fbToken = responseMap["token"]
+                Log.d(TAG, "authWithVkToken: ${fbToken}")
+                if (fbToken != null) {
+                    context.updatePreferences(Preferences.FirebaseToken, fbToken)
+                    signInWithCustomToken(fbToken)
+                } else {
+                    sendError("function don't return token")
+
+                }
+            } catch (th: Throwable) {
+                sendError(th.message.toString())
+            }
+        }
+    }
+
+
+
+
+    fun sendError(msg: String) {
+        Log.d(TAG, "sendError: $msg")
         _signedIn.postValue(AuthStatus.Error(msg))
         _signedIn.postValue(AuthStatus.NotAuthorized)
     }

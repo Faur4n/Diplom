@@ -24,6 +24,7 @@ android {
         }
         buildConfigField "String", "GOOGLE_WEB_SERVER_API_KEY", GOOGLE_WEB_SERVER_API_KEY
         buildConfigField "String", "SPORIFY_CLIENT_ID", SPORIFY_CLIENT_ID
+        buildConfigField "int", "VK_APP_ID", VK_APP_ID
     }
 
     buildTypes {
@@ -121,6 +122,11 @@ dependencies {
     //DATA STORE
     implementation "androidx.datastore:datastore-preferences:1.0.0-beta01"
 
+    //LOTTIE ANIMATIONS
     implementation "com.airbnb.android:lottie-compose:1.0.0-beta03-1"
+
+    //VK
+    implementation "com.vk:android-sdk-core:3.1.0"
+    implementation "com.vk:android-sdk-api:3.1.0"// generated models and api methods
 
 }

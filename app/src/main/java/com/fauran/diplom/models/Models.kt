@@ -7,6 +7,9 @@ import com.fauran.diplom.main.home.Section
 import com.google.firebase.firestore.PropertyName
 import com.google.gson.annotations.SerializedName
 
+const val ACC_TYPE_SPOTIFY = "spotify"
+const val ACC_TYPE_VK = "vk"
+
 data class SpotifyMe(
     @SerializedName("display_name")
     val displayName: String?,
@@ -47,7 +50,6 @@ data class User(
     var accounts : List<Account>?  = null
 )
 
-const val ACC_TYPE_SPOTIFY = "spotify"
 data class Account(
     @get:PropertyName("type")
     @set:PropertyName("type")

@@ -12,11 +12,16 @@ import androidx.navigation.compose.popUpTo
 import com.fauran.diplom.TAG
 import com.fauran.diplom.local.Preferences.FirebaseToken
 import com.fauran.diplom.local.Preferences.SpotifyToken
+import com.fauran.diplom.local.Preferences.VKToken
 import com.fauran.diplom.local.Preferences.updatePreferences
+import com.fauran.diplom.main.VkApi
 import com.fauran.diplom.models.*
 import com.fauran.diplom.navigation.Nav
 import com.fauran.diplom.network.SpotifyApi
+import com.fauran.diplom.util.isSpotifyUser
+import com.fauran.diplom.util.isVkUser
 import com.fauran.diplom.util.saveSpotifyToken
+import com.fauran.diplom.util.saveVkToken
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.firestore.ktx.toObjects
@@ -26,6 +31,8 @@ import com.skydoves.sandwich.message
 import com.skydoves.sandwich.onError
 import com.skydoves.sandwich.suspendOnSuccess
 import com.spotify.sdk.android.authentication.AuthenticationResponse
+import com.vk.api.sdk.VK
+import com.vk.api.sdk.auth.VKAccessToken
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
@@ -39,7 +46,6 @@ sealed class HomeStatus {
     object NotAuthorized : HomeStatus()
 }
 
-val isSpotifyUser get() = Firebase.auth.currentUser?.uid?.startsWith("spotify") == true
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
@@ -85,6 +91,13 @@ class HomeViewModel @Inject constructor(
         }else{
             null
         }
+        val friendsData = if(isVkUser){
+
+        }else{
+            null
+        }
+
+
         val user = User(
             gkey = uuid,
             email = email,
@@ -101,6 +114,7 @@ class HomeViewModel @Inject constructor(
     }
 
     private suspend fun saveUser(user: User){
+        currentUser = user
         kotlin.runCatching {
             db.collection("/users")
                 .document(user.gkey.toString())
@@ -113,6 +127,25 @@ class HomeViewModel @Inject constructor(
             _status.postValue(HomeStatus.Data(user))
         }
     }
+
+    fun connectVk(context: Context, token: VKAccessToken?) {
+        if (token == null ) {
+//            sendError("Bad spotify reponse")
+            return
+        }
+        val accessToken = token.accessToken
+        viewModelScope.launch {
+            saveVkToken(context ,accessToken)
+            val profile = VkApi.getVkProfile(token.userId)
+            saveVkAccount(
+                token = accessToken,
+                displayName = "${profile?.firstName} ${profile?.lastName}",
+                photoUrl = profile?.photo200Orig.toString()
+            )
+
+        }
+    }
+
 
     fun connectSpotify(context: Context,response: AuthenticationResponse?) {
         if (response == null || response.type != AuthenticationResponse.Type.TOKEN) {
@@ -159,10 +192,35 @@ class HomeViewModel @Inject constructor(
         }
     }
 
+    private suspend fun saveVkAccount(
+        token: String,
+        displayName:String,
+        photoUrl : String?,
+    ){
+        val curUser = currentUser
+        Log.d(TAG, "saveVkAccount: $curUser")
+        if(curUser != null){
+            val accs = (curUser.accounts ?: emptyList()).toMutableList()
+            val vkAccount = Account(
+                type = ACC_TYPE_VK,
+                name = displayName,
+                token = token,
+                photoUrl = photoUrl
+            )
+            accs.add(vkAccount)
+            val newUser = curUser.copy(
+                accounts = accs,
+            )
+            saveUser(newUser)
+        }
+    }
+
     fun logout(context: Context,navController: NavController?) {
         viewModelScope.launch {
             context.updatePreferences(SpotifyToken,"")
             context.updatePreferences(FirebaseToken,"")
+            context.updatePreferences(VKToken,"")
+            VK.logout()
             Firebase.auth.signOut()
             navController?.navigate(Nav.Auth.route) {
                 popUpTo(Nav.Main.route) {

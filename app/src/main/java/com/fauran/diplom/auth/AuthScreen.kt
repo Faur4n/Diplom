@@ -34,6 +34,7 @@ import com.fauran.diplom.R
 import com.fauran.diplom.TAG
 import com.fauran.diplom.auth.widgets.GoogleSignInButton
 import com.fauran.diplom.auth.widgets.SpotifySignInButton
+import com.fauran.diplom.auth.widgets.VkSignInButton
 import com.fauran.diplom.navigation.LocalRootNavController
 import com.fauran.diplom.navigation.Nav
 import com.fauran.diplom.ui.theme.*
@@ -170,7 +171,7 @@ fun AuthScreen(viewModel: AuthViewModel) {
 
                     }
                 )
-                Spacer(modifier = Modifier.size(16.dp))
+                Spacer(modifier = Modifier.size(32.dp))
                 SpotifySignInButton(
                     Modifier.align(Alignment.CenterHorizontally),
                     onResult = {
@@ -178,6 +179,19 @@ fun AuthScreen(viewModel: AuthViewModel) {
                     },
                     onStart = {
                         viewModel.loading()
+                    }
+                )
+                Spacer(modifier = Modifier.size(32.dp))
+                VkSignInButton(
+                    Modifier.align(Alignment.CenterHorizontally),
+                    onResult = {
+                            viewModel.authWithVkToken(context, it)
+                    },
+                    onStart = {
+                        viewModel.loading()
+                    },
+                    onError = { code ->
+                        viewModel.sendError("VK LOGIN ERROR CODE $code")
                     }
                 )
             }

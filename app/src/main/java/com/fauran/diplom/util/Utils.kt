@@ -5,6 +5,8 @@ import android.widget.Toast
 import androidx.compose.ui.graphics.Color
 import com.fauran.diplom.local.Preferences
 import com.fauran.diplom.local.Preferences.updatePreferences
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 
 
 fun Context.showToast(msg : String){
@@ -31,3 +33,9 @@ fun getMatColor(context: Context,typeColor: String): Color {
 suspend fun saveSpotifyToken(context: Context, token: String) {
     context.updatePreferences(Preferences.SpotifyToken, token)
 }
+suspend fun saveVkToken(context: Context, token: String) {
+    context.updatePreferences(Preferences.SpotifyToken, token)
+}
+val isSpotifyUser get() = Firebase.auth.currentUser?.uid?.startsWith("spotify") == true
+
+val isVkUser get() = Firebase.auth.currentUser?.uid?.startsWith("VK") == true

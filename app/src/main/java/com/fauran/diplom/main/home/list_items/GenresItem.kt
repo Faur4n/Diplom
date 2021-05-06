@@ -21,6 +21,7 @@ fun GenresItem(
 ) {
     FlowRow(
         crossAxisSpacing = 2.dp,
+        mainAxisSpacing = 2.dp,
         modifier = Modifier.fillMaxSize()
     ) {
         genres.take(25).forEach { genre ->
