@@ -4,6 +4,8 @@ import com.fauran.diplom.models.SpotifyMe
 import com.fauran.diplom.models.SpotifyTopArtistsResponse
 import com.skydoves.sandwich.ApiResponse
 import retrofit2.http.GET
+import retrofit2.http.Query
+import kotlin.random.Random
 
 
 interface SpotifyApiService{
@@ -12,5 +14,5 @@ interface SpotifyApiService{
     suspend fun getMe() : ApiResponse<SpotifyMe>
 
     @GET("me/top/artists")
-    suspend fun getTopArtists() : ApiResponse<SpotifyTopArtistsResponse>
+    suspend fun getTopArtists(@Query("offset") offset : Int = Random.nextInt(0,50)) : ApiResponse<SpotifyTopArtistsResponse>
 }

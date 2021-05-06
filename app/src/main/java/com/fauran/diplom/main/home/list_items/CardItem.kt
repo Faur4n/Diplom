@@ -28,6 +28,8 @@ import com.fauran.diplom.auth.widgets.SpotifySignInButton
 import com.fauran.diplom.auth.widgets.VkSignInButton
 import com.fauran.diplom.main.home.AvatarImage
 import com.fauran.diplom.main.home.HomeViewModel
+import com.fauran.diplom.main.home.LocalSpotifyEnabled
+import com.fauran.diplom.main.home.LocalVkEnabled
 import com.fauran.diplom.models.ACC_TYPE_SPOTIFY
 import com.fauran.diplom.models.ACC_TYPE_VK
 import com.fauran.diplom.models.User
@@ -42,24 +44,10 @@ fun CardItem(
     viewModel: HomeViewModel
 ) {
     val context = LocalContext.current
-    val spotifyConnected by remember(user) {
-        var hasSpotAcc = false
-        user?.accounts?.forEach { acc ->
-            if (acc.type == ACC_TYPE_SPOTIFY) {
-                hasSpotAcc = true
-            }
-        }
-        mutableStateOf(isSpotifyUser || hasSpotAcc)
-    }
-    val vkConnected by remember(user) {
-        var hasVkAcc = false
-        user?.accounts?.forEach { acc ->
-            if (acc.type == ACC_TYPE_VK) {
-                hasVkAcc = true
-            }
-        }
-        mutableStateOf(isVkUser || hasVkAcc)
-    }
+
+    val spotifyConnected  = LocalSpotifyEnabled.current
+
+    val vkConnected = LocalVkEnabled.current
 
     Card(
         modifier = Modifier

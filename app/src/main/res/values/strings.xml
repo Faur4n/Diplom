@@ -10,5 +10,6 @@
     <string name="no_name">Без имени</string>
     <string name="music_title">Музыка которая может вам понравится</string>
     <string name="genres_title">Ваши любимые жанры</string>
+    <string name="friends_title">Возможно вы знакомы с</string>
     <integer name="com_vk_sdk_AppId">7843673</integer>
 </resources>

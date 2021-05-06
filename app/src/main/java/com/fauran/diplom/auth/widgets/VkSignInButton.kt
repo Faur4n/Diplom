@@ -34,7 +34,7 @@ import com.vk.api.sdk.auth.VKAuthCallback
 import com.vk.api.sdk.auth.VKScope
 import com.vk.api.sdk.utils.VKUtils
 
-
+val vkScopes = listOf(VKScope.FRIENDS, VKScope.WALL, VKScope.AUDIO, VKScope.STATS)
 @Composable
 fun VkSignInButton(
     modifier: Modifier = Modifier,
@@ -55,7 +55,7 @@ fun VkSignInButton(
                 if (activity != null) {
                     VK.login(
                         activity,
-                        listOf(VKScope.FRIENDS, VKScope.WALL, VKScope.AUDIO, VKScope.STATS)
+                        vkScopes
                     )
                     callback.registerForCallback(object : VKAuthCallback {
                         override fun onLogin(token: VKAccessToken) {

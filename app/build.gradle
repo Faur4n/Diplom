@@ -92,6 +92,7 @@ dependencies {
     implementation "com.google.accompanist:accompanist-pager-indicators:$accompanistVersion"
     implementation "com.google.accompanist:accompanist-flowlayout:$accompanistVersion"
     implementation "com.google.accompanist:accompanist-systemuicontroller:$accompanistVersion"
+    implementation "com.google.accompanist:accompanist-swiperefresh:$accompanistVersion"
 
     //Firebase
     implementation platform('com.google.firebase:firebase-bom:27.1.0')

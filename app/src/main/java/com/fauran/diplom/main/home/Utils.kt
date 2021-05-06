@@ -3,7 +3,7 @@ package com.fauran.diplom.main.home
 import android.content.Context
 import androidx.annotation.StringRes
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Audiotrack
+import androidx.compose.material.icons.filled.People
 import androidx.compose.material.icons.outlined.SpeakerGroup
 import androidx.compose.material.icons.sharp.Audiotrack
 import androidx.compose.ui.graphics.Brush
@@ -19,12 +19,12 @@ import java.util.*
 
 fun User.createSections(context: Context): List<Section> {
     val sections = mutableListOf<Section>()
-    val mMusic = music
-    if (mMusic != null){
+    val music = music
+    if (music != null){
         sections.add(
             Section(
                 R.string.music_title,
-                mMusic,
+                music.shuffled(),
                 ThemeColor(
                     Purple200,
                     Purple500,
@@ -40,14 +40,14 @@ fun User.createSections(context: Context): List<Section> {
                 icon =  Icons.Sharp.Audiotrack
             )
         )
-        val genres = mMusic.map {
+        val genres = music.map {
             it.genres ?: emptyList()
         }.flatten().map {
             Genre(
                 name = it,
                 color = getMatColor(context = context,"200")
             )
-        }
+        }.shuffled()
         sections.add(
             Section(
                 title = R.string.genres_title,
@@ -68,6 +68,29 @@ fun User.createSections(context: Context): List<Section> {
             )
         )
     }
+    val friends = friends
+    if(friends != null){
+        sections.add(
+            Section(
+                title = R.string.friends_title,
+                items = friends,
+                colors = ThemeColor(
+                    Green200,
+                    Green500,
+                    Green700,
+                    Brush.verticalGradient(
+                        colors = listOf(
+                            Green200,
+                            Green500,
+                            Green700,
+                        )
+                    )
+                ),
+                icon = Icons.Filled.People
+            )
+        )
+    }
+
     return sections
 }
 

@@ -52,7 +52,4 @@ class SpotifySignInContract : ActivityResultContract<Int, AuthenticationResponse
         return AuthenticationClient.getResponse(resultCode, result)
     }
 
-    private fun getMe(token: String){
-
-    }
 }

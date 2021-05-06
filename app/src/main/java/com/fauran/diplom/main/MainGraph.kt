@@ -23,6 +23,7 @@ import com.google.accompanist.pager.ExperimentalPagerApi
 
 val LocalMainNavController = staticCompositionLocalOf<NavController?>{ null }
 
+@ExperimentalPagerApi
 @ExperimentalFoundationApi
 @Composable
 fun MainGraph(){

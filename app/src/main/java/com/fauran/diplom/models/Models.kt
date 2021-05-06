@@ -47,8 +47,39 @@ data class User(
     var music: List<MusicData>? = null,
     @get:PropertyName("accounts")
     @set:PropertyName("accounts")
-    var accounts : List<Account>?  = null
+    var accounts : List<Account>?  = null,
+    @get:PropertyName("friends")
+    @set:PropertyName("friends")
+    var friends : List<RelatedFriend>? = null
 )
+
+data class RelatedFriend(
+    @get:PropertyName("firstName")
+    @set:PropertyName("firstName")
+    var firstName : String? = null,
+    @get:PropertyName("lastName")
+    @set:PropertyName("lastName")
+    var lastName : String? = null,
+    @get:PropertyName("sex")
+    @set:PropertyName("sex")
+    var sex : String? = null,
+    @get:PropertyName("city")
+    @set:PropertyName("city")
+    var city : String? = null,
+    @get:PropertyName("country")
+    @set:PropertyName("country")
+    var country : String? = null,
+    @get:PropertyName("photo")
+    @set:PropertyName("photo")
+    var photo : String? = null,
+    @get:PropertyName("domain")
+    @set:PropertyName("domain")
+    var domain : String? = null,
+    @get:PropertyName("interests")
+    @set:PropertyName("interests")
+    var interests : String? = null
+) : BaseSection()
+
 
 data class Account(
     @get:PropertyName("type")
