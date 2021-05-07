@@ -14,6 +14,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.vk.api.sdk.VK
+import com.vk.api.sdk.VKApiConfig
 import com.vk.api.sdk.auth.VKAuthCallback
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -41,6 +42,7 @@ class MainActivity : ComponentActivity() {
     @ExperimentalPagerApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        VK.setConfig(VKApiConfig(this,lang = "ru"))
 
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestEmail()

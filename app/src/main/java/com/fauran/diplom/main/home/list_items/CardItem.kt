@@ -1,5 +1,8 @@
 package com.fauran.diplom.main.home.list_items
 
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -8,14 +11,12 @@ import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Done
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -41,25 +42,31 @@ import com.fauran.diplom.util.isVkUser
 @Composable
 fun CardItem(
     user: User?,
-    viewModel: HomeViewModel
+    viewModel: HomeViewModel,
+    modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
 
     val spotifyConnected  = LocalSpotifyEnabled.current
 
     val vkConnected = LocalVkEnabled.current
-
+    val animatedProgress = remember { Animatable(initialValue = 0.8f) }
+    LaunchedEffect(Unit) {
+        animatedProgress.animateTo(
+            targetValue = 1f,
+            animationSpec = tween(300, easing = LinearEasing)
+        )
+    }
     Card(
         modifier = Modifier
             .fillMaxSize()
             .clip(RoundedCornerShape(10.dp))
             .shadow(32.dp)
-
+            .graphicsLayer(scaleY = animatedProgress.value, scaleX = animatedProgress.value)
     ) {
         Column(
             modifier = Modifier.padding(16.dp)
         ) {
-            Spacer(modifier = Modifier.size(16.dp))
             Row() {
                 Text(
                     text = user?.name ?: stringResource(id = R.string.no_name),
@@ -71,7 +78,7 @@ fun CardItem(
                 )
                 AvatarImage(
                     user?.photoUrl,
-                    modifier = Modifier.size(40.dp)
+                    modifier = Modifier.size(64.dp)
                 )
             }
             Spacer(modifier = Modifier.size(16.dp))

@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.annotation.StringRes
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.People
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.SpeakerGroup
 import androidx.compose.material.icons.sharp.Audiotrack
 import androidx.compose.material.icons.sharp.ContactSupport
@@ -57,6 +58,17 @@ fun User.createSections(context: Context): List<Section> {
             )
         )
     }
+    val suggestions = suggestions
+    if(suggestions != null){
+        sections.add(
+            Section(
+                R.string.suggestions_title,
+                suggestions,
+                Icons.Default.Star
+            )
+        )
+    }
+
     if(sections.isEmpty()){
         sections.add(emptySection)
     }

@@ -6,6 +6,7 @@ import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.animation.Crossfade
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -19,17 +20,21 @@ import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.fauran.diplom.LocalVkCallback
+import com.fauran.diplom.R
 import com.fauran.diplom.TAG
 import com.fauran.diplom.auth.contracts.SpotifySignInContract
 import com.fauran.diplom.main.home.list_items.*
 import com.fauran.diplom.models.*
 import com.fauran.diplom.navigation.LocalRootNavController
+import com.fauran.diplom.ui.theme.Typography
 import com.fauran.diplom.ui.theme.defaultThemeColor
+import com.fauran.diplom.ui.theme.white
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
@@ -42,7 +47,7 @@ val LocalVkEnabled = compositionLocalOf { false }
 
 sealed class HomeScreen {
     object Home : HomeScreen()
-    data class Genres(val genre: Genre,val artists: List<SpotifyArtist>) : HomeScreen()
+    data class Genres(val genre: Genre, val artists: List<SpotifyArtist>) : HomeScreen()
 }
 
 @ExperimentalPagerApi
@@ -125,12 +130,12 @@ fun HomeScreen(
 
     val showGenres by viewModel.showGenres.observeAsState(viewModel.showGenres.value)
 
-    LaunchedEffect(showGenres){
+    LaunchedEffect(showGenres) {
         val genres = showGenres
         Log.d(TAG, "HomeScreen: $genres")
-        if(genres != null){
+        if (genres != null) {
             onScreenChanged(genres)
-//            viewModel.consumeGenres()
+            viewModel.consumeGenres()
         }
     }
 
@@ -152,7 +157,7 @@ fun HomeScreen(
         }
     }
 
-    DisposableEffect(dispatcher,screen) {
+    DisposableEffect(dispatcher, screen) {
         dispatcher?.onBackPressedDispatcher?.addCallback(backCallback)
         onDispose {
             backCallback.remove()
@@ -169,7 +174,7 @@ fun HomeScreen(
         ) { newScreen ->
             when (newScreen) {
                 is HomeScreen.Genres -> {
-                    GenresScreen(artists = newScreen.artists,genre = newScreen.genre) {
+                    GenresScreen(artists = newScreen.artists, genre = newScreen.genre) {
                         onScreenChanged(HomeScreen.Home)
                     }
                 }
@@ -199,7 +204,6 @@ fun HomeScreen(
                                     }
                                 }
                             } else {
-
                                 SwipeRefresh(
                                     state = rememberSwipeRefreshState(isRefreshing),
                                     onRefresh = {
@@ -207,6 +211,7 @@ fun HomeScreen(
                                     }) {
                                     LazyColumn(
                                         state = listState,
+                                        contentPadding = PaddingValues(bottom = 32.dp),
                                         verticalArrangement = Arrangement.spacedBy(8.dp),
                                         modifier = Modifier
                                             .background(
@@ -216,7 +221,46 @@ fun HomeScreen(
                                             .fillMaxSize()
                                     ) {
                                         item {
-                                            CardItem(user = user, viewModel)
+                                            val animatedProgress = remember {
+                                                androidx.compose.animation.core.Animatable(
+                                                    initialValue = 0.8f
+                                                )
+                                            }
+                                            LaunchedEffect(Unit) {
+                                                animatedProgress.animateTo(
+                                                    targetValue = 1f,
+                                                    animationSpec = tween(300)
+                                                )
+                                            }
+                                            Column(
+                                                verticalArrangement = Arrangement.spacedBy(8.dp),
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                                    .padding(
+                                                        8.dp
+                                                    )
+                                            ) {
+                                                Text(
+                                                    text = stringResource(id = R.string.hello),
+                                                    style = Typography.h3,
+                                                    color = white,
+
+                                                )
+                                                Text(
+                                                    text = stringResource(id = R.string.description),
+                                                    style = Typography.subtitle2,
+                                                    color = white,
+                                                )
+                                                CardItem(
+                                                    user = user,
+                                                    viewModel,
+                                                    Modifier.graphicsLayer(
+                                                        scaleY = animatedProgress.value,
+                                                        scaleX = animatedProgress.value
+                                                    )
+
+                                                )
+                                            }
                                         }
                                         sections.forEach { section ->
                                             stickyHeader(section.id + "|") {
@@ -229,9 +273,7 @@ fun HomeScreen(
                                             when {
                                                 items.isNotEmpty() && items.first() is MusicData -> {
                                                     val data = items.map { it as MusicData }
-                                                    items(data.windowed(2, 2, true), key = {
-                                                        section.id + "|" + it?.hashCode()
-                                                    }) { item ->
+                                                    items(data.windowed(2, 2, true)) { item ->
                                                         Row(modifier = Modifier.fillMaxWidth()) {
                                                             val first = item.firstOrNull()
                                                             if (first != null) {
@@ -252,7 +294,7 @@ fun HomeScreen(
                                                 }
                                                 items.isNotEmpty() && items.first() is Genre -> {
                                                     val item = items.map { it as Genre }
-                                                    item(key = section.id + "|" + item?.hashCode()) {
+                                                    item() {
                                                         GenresItem(item) { genre ->
                                                             viewModel.downloadGenreInfo(genre)
                                                         }
@@ -261,8 +303,14 @@ fun HomeScreen(
                                                 items.isNotEmpty() && items.first() is RelatedFriend -> {
                                                     val item = items.map { it as RelatedFriend }
 
-                                                    item(key = section.id + "|" + item?.hashCode()) {
+                                                    item() {
                                                         FriendsRow(friends = item)
+                                                    }
+                                                }
+                                                items.isNotEmpty() && items.first() is Suggestion ->{
+                                                    val item = items.map { it as Suggestion }
+                                                    item() {
+                                                        Text(text = item.toString())
                                                     }
                                                 }
                                             }

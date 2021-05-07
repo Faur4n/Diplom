@@ -19,6 +19,7 @@ import com.fauran.diplom.local.Preferences.VKToken
 import com.fauran.diplom.local.Preferences.updatePreferences
 import com.fauran.diplom.main.VkApi
 import com.fauran.diplom.main.VkApi.toRelatedFriends
+import com.fauran.diplom.main.VkApi.toSuggestion
 import com.fauran.diplom.models.*
 import com.fauran.diplom.navigation.Nav
 import com.fauran.diplom.network.SpotifyApi
@@ -37,6 +38,8 @@ import com.vk.api.sdk.VK
 import com.vk.api.sdk.VKTokenExpiredHandler
 import com.vk.api.sdk.auth.VKAccessToken
 import com.vk.api.sdk.auth.VKAuthCallback
+import com.vk.sdk.api.newsfeed.dto.NewsfeedGetSuggestedSourcesResponse
+import com.vk.sdk.api.users.dto.UsersSubscriptionsItem
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.tasks.await
@@ -168,7 +171,6 @@ class HomeViewModel @Inject constructor(
                         val friends = user.friends
                         if (isVkEnabled && (friends == null || friends.isEmpty())) {
                             viewModelScope.launch {
-                                lastFunction = DeferredFunction(this@HomeViewModel::updateUserMusic)
                                 updateUserFriends()
                             }
                         }
@@ -185,22 +187,28 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    suspend fun updateUserFriends() {
+    suspend fun updateUserFriends() = coroutineScope {
         _isRefreshing.postValue(true)
-
-        val friends = getFriendsData()
+        val suggestion = async {
+            getSuggestions()
+        }
+        Log.d(TAG, "updateUserFriends: $suggestion")
+        val friends = async {
+            getFriendsData()
+        }
         val user = currentUser
         if (user != null) {
             val newUser = user.copy(
-                friends = friends
+                friends = friends.await(),
+                suggestions = suggestion.await()
             )
             saveUser(newUser)
         }
         _isRefreshing.postValue(false)
-
     }
 
     suspend fun updateUserMusic() {
+        lastFunction = DeferredFunction(this@HomeViewModel::updateUserMusic)
         _isRefreshing.postValue(true)
         Log.d(TAG, "updateUserMusic: UPDATE MUSIC")
         val musicData = getMusicData()
@@ -256,6 +264,10 @@ class HomeViewModel @Inject constructor(
 
     suspend fun getFriendsData(): List<RelatedFriend> {
         return VkApi.getRelatedFriends().items.map { it.toRelatedFriends() }
+    }
+
+    suspend fun getSuggestions(): List<Suggestion>? {
+        return VkApi.getNewsSuggestions().items?.map { it.toSuggestion() }
     }
 
     private suspend fun saveUser(user: User) {
@@ -410,9 +422,10 @@ class HomeViewModel @Inject constructor(
     fun refresh() {
         viewModelScope.launch {
             if (isSpotifyEnabled.value == true) {
-                lastFunction = DeferredFunction(this@HomeViewModel::updateUserMusic)
                 updateUserMusic()
             }
+        }
+        viewModelScope.launch {
             if (isVkEnabled.value == true) {
                 updateUserFriends()
             }

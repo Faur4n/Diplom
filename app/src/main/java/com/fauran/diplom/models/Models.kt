@@ -52,7 +52,10 @@ data class User(
     var accounts : List<Account>?  = null,
     @get:PropertyName("friends")
     @set:PropertyName("friends")
-    var friends : List<RelatedFriend>? = null
+    var friends : List<RelatedFriend>? = null,
+    @get:PropertyName("suggestions")
+    @set:PropertyName("suggestions")
+    var suggestions : List<Suggestion>? = null,
 )
 
 data class RelatedFriend(
@@ -79,7 +82,10 @@ data class RelatedFriend(
     var domain : String? = null,
     @get:PropertyName("interests")
     @set:PropertyName("interests")
-    var interests : String? = null
+    var interests : String? = null,
+    @get:PropertyName("id")
+    @set:PropertyName("id")
+    var id : String? = null
 ) : BaseSection()
 
 
@@ -159,4 +165,34 @@ data class ThemeColor(
     val gradient: Brush
 )
 
+
+data class Suggestion(
+    @get:PropertyName("firstName")
+    @set:PropertyName("firstName")
+    var firstName : String? = null,
+    @get:PropertyName("city")
+    @set:PropertyName("city")
+    var city : String? = null,
+    @get:PropertyName("description")
+    @set:PropertyName("description")
+    var description : String? = null,
+    @get:PropertyName("lastName")
+    @set:PropertyName("lastName")
+    var lastName : String? = null,
+    @get:PropertyName("id")
+    @set:PropertyName("id")
+    var id : String? = null,
+    @get:PropertyName("name")
+    @set:PropertyName("name")
+    var name : String? = null,
+    @get:PropertyName("type")
+    @set:PropertyName("type")
+    var type : String? = null,
+    @get:PropertyName("screenName")
+    @set:PropertyName("screenName")
+    var screenName : String? = null,
+    @get:PropertyName("photo")
+    @set:PropertyName("photo")
+    var photo : String? = null,
+) : BaseSection()
 
