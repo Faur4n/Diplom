@@ -32,7 +32,8 @@ class SpotifySignInContract : ActivityResultContract<Int, AuthenticationResponse
                     "user-top-read",
                     "user-follow-read",
                     "user-read-email",
-                    "user-library-read"
+                    "user-library-read",
+                    "user-read-private"
                 ))
                 .build()
 

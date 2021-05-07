@@ -1,5 +1,8 @@
 package com.fauran.diplom.network
 
+import com.fauran.diplom.main.home.Genre
+import com.fauran.diplom.models.SearchArtistResponse
+import com.skydoves.sandwich.ApiResponse
 
 
 class SpotifyApi(
@@ -8,4 +11,9 @@ class SpotifyApi(
     suspend fun getMe() = api.getMe()
 
     suspend fun getTopArtists() = api.getTopArtists()
+
+    suspend fun getGenreInfo(genre: Genre): ApiResponse<SearchArtistResponse> {
+        val searchQuery = "genre:${genre.name}"
+        return api.getSearchArtist(searchQuery)
+    }
 }

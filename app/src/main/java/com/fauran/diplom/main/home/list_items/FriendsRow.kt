@@ -27,12 +27,13 @@ import kotlin.math.absoluteValue
 fun FriendsRow(
     friends: List<RelatedFriend>
 ) {
-    val pagerState = rememberPagerState(friends.size)
-    HorizontalPager(state = pagerState,
-        offscreenLimit  = 1,
+    val pagerState = rememberPagerState(friends.size, initialOffscreenLimit = 5)
+    HorizontalPager(
+        state = pagerState,
         modifier = Modifier
-        .fillMaxWidth()
-        .height(200.dp)) { page ->
+            .fillMaxWidth()
+            .height(200.dp)
+    ) { page ->
         Card(
             Modifier
                 .graphicsLayer {

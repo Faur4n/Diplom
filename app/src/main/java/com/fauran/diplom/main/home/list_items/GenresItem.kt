@@ -1,6 +1,7 @@
 package com.fauran.diplom.main.home.list_items
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -17,12 +18,14 @@ import com.google.accompanist.flowlayout.FlowRow
 
 @Composable
 fun GenresItem(
-    genres: List<Genre>
+    genres: List<Genre>,
+    modifier: Modifier = Modifier,
+    onItemClick : (Genre) -> Unit
 ) {
     FlowRow(
         crossAxisSpacing = 2.dp,
         mainAxisSpacing = 2.dp,
-        modifier = Modifier.fillMaxSize()
+        modifier = modifier.fillMaxSize()
     ) {
         genres.take(25).forEach { genre ->
             Box(
@@ -31,7 +34,10 @@ fun GenresItem(
                         genre.color,
                         shape = RoundedCornerShape(10.dp)
                     )
-                    .padding(start = 8.dp,top = 4.dp , end = 8.dp , bottom = 4.dp)
+                    .clickable {
+                        onItemClick(genre)
+                    }
+                    .padding(start = 16.dp,top = 8.dp , end = 16.dp , bottom = 8.dp)
             ) {
                 Text(text = genre.name, style = Typography.subtitle1, color = spotifyBlack)
             }

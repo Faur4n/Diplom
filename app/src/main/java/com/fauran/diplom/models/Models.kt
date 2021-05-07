@@ -1,6 +1,8 @@
 package com.fauran.diplom.models
 
 import androidx.annotation.StringRes
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import com.fauran.diplom.R
 import com.fauran.diplom.main.home.BaseSection
 import com.fauran.diplom.main.home.Section
@@ -131,4 +133,30 @@ data class SpotifyTopArtistsItem(
         )
     }
 }
+
+data class SearchArtistResponse(
+    val artists: SpotifyArtists
+)
+
+data class SpotifyArtists(
+    val items : List<SpotifyArtist>
+)
+
+data class SpotifyArtist(
+    @SerializedName("uri")
+    val uri : String? = null,
+    val name : String? = null,
+    val images : List<SpotifyImage>? = null,
+    val id : String? = null
+)
+
+
+
+data class ThemeColor(
+    val light: Color,
+    val medium: Color,
+    val dark: Color,
+    val gradient: Brush
+)
+
 

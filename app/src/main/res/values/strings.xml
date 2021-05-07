@@ -11,5 +11,7 @@
     <string name="music_title">Музыка которая может вам понравится</string>
     <string name="genres_title">Ваши любимые жанры</string>
     <string name="friends_title">Возможно вы знакомы с</string>
+    <string name="empty_section">Oops...</string>
     <integer name="com_vk_sdk_AppId">7843673</integer>
+    <string name="genres_screen_title">Популярные исполнители</string>
 </resources>

@@ -71,7 +71,7 @@ fun CardItem(
                 )
                 AvatarImage(
                     user?.photoUrl,
-                    modifier = Modifier.size(32.dp)
+                    modifier = Modifier.size(40.dp)
                 )
             }
             Spacer(modifier = Modifier.size(16.dp))
