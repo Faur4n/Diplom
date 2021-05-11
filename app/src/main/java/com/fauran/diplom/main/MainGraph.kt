@@ -15,9 +15,12 @@ import androidx.hilt.navigation.compose.hiltNavGraphViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.getBackStackEntry
 import androidx.navigation.compose.rememberNavController
 import com.fauran.diplom.main.home.HomeScreen
 import com.fauran.diplom.main.home.HomeViewModel
+import com.fauran.diplom.navigation.LocalRootNavController
+import com.fauran.diplom.navigation.Nav
 import com.fauran.diplom.navigation.Screen
 import com.google.accompanist.pager.ExperimentalPagerApi
 
@@ -28,13 +31,18 @@ val LocalMainNavController = staticCompositionLocalOf<NavController?>{ null }
 @Composable
 fun MainGraph(){
     val navController = rememberNavController()
+    val rootNavController = LocalRootNavController.current
     CompositionLocalProvider(
         LocalMainNavController provides navController
     ) {
         NavHost(navController = navController, startDestination = Screen.HomeScreen.route){
             composable(Screen.HomeScreen.route){
-                val viewModel : HomeViewModel = hiltNavGraphViewModel()
-                HomeScreen(viewModel = viewModel)
+                rootNavController?.let { controller ->
+                    val viewModel : HomeViewModel = hiltNavGraphViewModel(
+                        controller.getBackStackEntry(Nav.Main.route)
+                    )
+                    HomeScreen(viewModel = viewModel)
+                }
             }
         }
     }

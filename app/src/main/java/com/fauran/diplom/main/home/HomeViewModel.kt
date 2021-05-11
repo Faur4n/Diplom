@@ -85,7 +85,7 @@ class HomeViewModel @Inject constructor(
     private var spotifyLauncher: ActivityResultLauncher<Int>? = null
     private var vkLauncher: ActivityResultLauncher<Int>? = null
 
-    var lastFunction : DeferredFunction? = null
+//    var lastFunction : DeferredFunction? = null
 
     fun init(spotifyLauncher: ActivityResultLauncher<Int>) {
         this.spotifyLauncher = spotifyLauncher
@@ -164,9 +164,7 @@ class HomeViewModel @Inject constructor(
                         }
                         val music = user.music
                         if (isSpotifyEnabled && (user.music == null || music == null || music.isEmpty())) {
-                            viewModelScope.launch {
                                 updateUserMusic()
-                            }
                         }
                         val friends = user.friends
                         if (isVkEnabled && (friends == null || friends.isEmpty())) {
@@ -207,18 +205,20 @@ class HomeViewModel @Inject constructor(
         _isRefreshing.postValue(false)
     }
 
-    suspend fun updateUserMusic() {
-        lastFunction = DeferredFunction(this@HomeViewModel::updateUserMusic)
-        _isRefreshing.postValue(true)
-        Log.d(TAG, "updateUserMusic: UPDATE MUSIC")
-        val musicData = getMusicData()
-        val newUser = currentUser?.copy(
-            music = musicData
-        )
-        if (newUser != null) {
-            saveUser(newUser)
+    fun updateUserMusic() {
+        viewModelScope.launch {
+//            lastFunction = DeferredFunction(this@HomeViewModel::updateUserMusic)
+            _isRefreshing.postValue(true)
+            Log.d(TAG, "updateUserMusic: UPDATE MUSIC")
+            val musicData = getMusicData()
+            val newUser = currentUser?.copy(
+                music = musicData
+            )
+            if (newUser != null) {
+                saveUser(newUser)
+            }
+            _isRefreshing.postValue(false)
         }
-        _isRefreshing.postValue(false)
 
     }
 
@@ -244,7 +244,8 @@ class HomeViewModel @Inject constructor(
             val token = response?.accessToken
             if (token != null) {
                 saveSpotifyToken(context, token)
-                lastFunction?.invoke()
+                refresh()
+//                lastFunction?.invoke()
 //                getMusicData()
             }
         }
@@ -391,7 +392,7 @@ class HomeViewModel @Inject constructor(
     }
 
     fun downloadGenreInfo(genre: Genre){
-        lastFunction = DeferredFunction(this@HomeViewModel::downloadGenreInfo,genre)
+//        lastFunction = DeferredFunction(this@HomeViewModel::downloadGenreInfo)
         downloadJob?.cancel()
         downloadJob = viewModelScope.launch {
             spotifyApi.getGenreInfo(genre).suspendOnSuccess {
@@ -412,7 +413,7 @@ class HomeViewModel @Inject constructor(
     }
 
     private fun ApiResponse.Failure.Error<*>.handleSpotifyAuthError(){
-        if (statusCode.code == 401) {
+        if (statusCode.code == 401 || statusCode.code == 400) {
             spotifyLauncher?.launch(SPOTIFY_SIGN_IN)
         }else{
             sendError(errorBody?.string().toString())
@@ -420,10 +421,8 @@ class HomeViewModel @Inject constructor(
     }
 
     fun refresh() {
-        viewModelScope.launch {
-            if (isSpotifyEnabled.value == true) {
-                updateUserMusic()
-            }
+        if (isSpotifyEnabled.value == true) {
+            updateUserMusic()
         }
         viewModelScope.launch {
             if (isVkEnabled.value == true) {

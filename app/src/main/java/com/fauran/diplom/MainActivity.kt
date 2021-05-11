@@ -42,7 +42,7 @@ class MainActivity : ComponentActivity() {
     @ExperimentalPagerApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        VK.setConfig(VKApiConfig(this,lang = "ru"))
+        VK.setConfig(VKApiConfig(this,lang = "ru",appId = BuildConfig.VK_APP_ID))
 
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestEmail()
