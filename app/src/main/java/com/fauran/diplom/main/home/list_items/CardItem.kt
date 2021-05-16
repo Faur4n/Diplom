@@ -27,12 +27,10 @@ import androidx.compose.ui.unit.dp
 import com.fauran.diplom.R
 import com.fauran.diplom.auth.widgets.SpotifySignInButton
 import com.fauran.diplom.auth.widgets.VkSignInButton
-import com.fauran.diplom.main.home.AvatarImage
+import com.fauran.diplom.main.home.widgets.AvatarImage
 import com.fauran.diplom.main.home.HomeViewModel
 import com.fauran.diplom.main.home.LocalSpotifyEnabled
 import com.fauran.diplom.main.home.LocalVkEnabled
-import com.fauran.diplom.models.ACC_TYPE_SPOTIFY
-import com.fauran.diplom.models.ACC_TYPE_VK
 import com.fauran.diplom.models.User
 import com.fauran.diplom.ui.theme.Green500
 import com.fauran.diplom.ui.theme.Typography

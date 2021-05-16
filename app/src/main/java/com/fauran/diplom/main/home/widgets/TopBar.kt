@@ -1,4 +1,4 @@
-package com.fauran.diplom.main.home
+package com.fauran.diplom.main.home.widgets
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border

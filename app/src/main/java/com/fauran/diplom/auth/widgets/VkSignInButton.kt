@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import com.fauran.diplom.*
 import com.fauran.diplom.auth.contracts.GoogleSignInContract
 import com.fauran.diplom.auth.contracts.SpotifySignInContract
+import com.fauran.diplom.main.vk_api.LocalVkCallback
 import com.fauran.diplom.ui.theme.googleText
 import com.fauran.diplom.ui.theme.spotifyBlack
 import com.fauran.diplom.ui.theme.spotifyGreen

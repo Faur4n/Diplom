@@ -1,4 +1,4 @@
-package com.fauran.diplom.main
+package com.fauran.diplom.main.vk_api
 
 import android.util.Log
 import com.fauran.diplom.TAG

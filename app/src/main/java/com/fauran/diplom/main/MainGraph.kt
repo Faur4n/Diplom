@@ -17,6 +17,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.getBackStackEntry
 import androidx.navigation.compose.rememberNavController
+import com.fauran.diplom.main.home.HomeHostScreen
 import com.fauran.diplom.main.home.HomeScreen
 import com.fauran.diplom.main.home.HomeViewModel
 import com.fauran.diplom.navigation.LocalRootNavController
@@ -41,7 +42,7 @@ fun MainGraph(){
                     val viewModel : HomeViewModel = hiltNavGraphViewModel(
                         controller.getBackStackEntry(Nav.Main.route)
                     )
-                    HomeScreen(viewModel = viewModel)
+                    HomeHostScreen(viewModel = viewModel)
                 }
             }
         }

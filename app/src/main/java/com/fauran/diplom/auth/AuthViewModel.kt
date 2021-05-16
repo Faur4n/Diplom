@@ -9,7 +9,7 @@ import androidx.lifecycle.viewModelScope
 import com.fauran.diplom.TAG
 import com.fauran.diplom.local.Preferences
 import com.fauran.diplom.local.Preferences.updatePreferences
-import com.fauran.diplom.main.VkApi
+import com.fauran.diplom.main.vk_api.VkApi
 import com.fauran.diplom.models.SpotifyMe
 import com.fauran.diplom.network.SpotifyApi
 import com.fauran.diplom.util.saveSpotifyToken
@@ -25,17 +25,11 @@ import com.skydoves.sandwich.message
 import com.skydoves.sandwich.onError
 import com.skydoves.sandwich.suspendOnSuccess
 import com.spotify.sdk.android.authentication.AuthenticationResponse
-import com.vk.api.sdk.VK
-import com.vk.api.sdk.VKApiCallback
 import com.vk.api.sdk.auth.VKAccessToken
-import com.vk.sdk.api.users.UsersService
-import com.vk.sdk.api.users.dto.UsersFields
-import com.vk.sdk.api.users.dto.UsersUserXtrCounters
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
-import kotlin.coroutines.suspendCoroutine
 
 
 sealed class AuthStatus {

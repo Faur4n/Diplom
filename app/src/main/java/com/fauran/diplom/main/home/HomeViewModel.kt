@@ -10,16 +10,16 @@ import androidx.navigation.compose.navigate
 import androidx.navigation.compose.popUpTo
 import com.fauran.diplom.SPOTIFY_SIGN_IN
 import com.fauran.diplom.TAG
-import com.fauran.diplom.VKCallback
 import com.fauran.diplom.VK_SIGN_IN
 import com.fauran.diplom.auth.widgets.vkScopes
 import com.fauran.diplom.local.Preferences.FirebaseToken
 import com.fauran.diplom.local.Preferences.SpotifyToken
 import com.fauran.diplom.local.Preferences.VKToken
 import com.fauran.diplom.local.Preferences.updatePreferences
-import com.fauran.diplom.main.VkApi
-import com.fauran.diplom.main.VkApi.toRelatedFriends
-import com.fauran.diplom.main.VkApi.toSuggestion
+import com.fauran.diplom.main.vk_api.VKCallback
+import com.fauran.diplom.main.vk_api.VkApi
+import com.fauran.diplom.main.vk_api.VkApi.toRelatedFriends
+import com.fauran.diplom.main.vk_api.VkApi.toSuggestion
 import com.fauran.diplom.models.*
 import com.fauran.diplom.navigation.Nav
 import com.fauran.diplom.network.SpotifyApi
@@ -38,15 +38,12 @@ import com.vk.api.sdk.VK
 import com.vk.api.sdk.VKTokenExpiredHandler
 import com.vk.api.sdk.auth.VKAccessToken
 import com.vk.api.sdk.auth.VKAuthCallback
-import com.vk.sdk.api.newsfeed.dto.NewsfeedGetSuggestedSourcesResponse
-import com.vk.sdk.api.users.dto.UsersSubscriptionsItem
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.tasks.await
 import java.util.*
 import javax.inject.Inject
 import kotlin.reflect.KFunction
-import kotlin.reflect.KSuspendFunction0
 
 sealed class HomeStatus {
     object Loading : HomeStatus()
@@ -54,12 +51,6 @@ sealed class HomeStatus {
     data class Error(val msg: String) : HomeStatus()
     data class Data(val user: User) : HomeStatus()
     object NotAuthorized : HomeStatus()
-}
-class DeferredFunction(val function: KFunction<Any>, vararg val params: Any?)  {
-    @Suppress("UNCHECKED_CAST")
-    operator fun invoke(): Any? {
-        return function.call(params)
-    }
 }
 
 @HiltViewModel
@@ -69,6 +60,7 @@ class HomeViewModel @Inject constructor(
 
     private val _status = MutableLiveData<HomeStatus>(HomeStatus.Loading)
     val status: LiveData<HomeStatus> = _status
+
     private val db = Firebase.firestore
     private val auth = Firebase.auth
     private var currentUser: User? = null
@@ -175,7 +167,7 @@ class HomeViewModel @Inject constructor(
 
                         _isSpotifyEnabled.postValue(isSpotifyEnabled)
                         _isVkEnabled.postValue(isVkEnabled)
-
+                        Log.d(TAG, "listenUser: $user")
                         _status.postValue(HomeStatus.Data(user))
                     } else {
                         _status.postValue(HomeStatus.FirstLaunch)
