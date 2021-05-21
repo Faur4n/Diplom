@@ -30,21 +30,17 @@ import com.fauran.diplom.TAG
 import com.fauran.diplom.models.RelatedFriend
 import com.fauran.diplom.ui.theme.Typography
 import com.google.accompanist.coil.rememberCoilPainter
-import com.google.accompanist.pager.ExperimentalPagerApi
-import com.google.accompanist.pager.HorizontalPager
-import com.google.accompanist.pager.calculateCurrentOffsetForPage
-import com.google.accompanist.pager.rememberPagerState
+import com.google.accompanist.pager.*
 import kotlin.math.absoluteValue
 
 
 @ExperimentalPagerApi
 @Composable
 fun FriendsRow(
-    friends: List<RelatedFriend>
+    friends: List<RelatedFriend>,
+    pagerState: PagerState
 ) {
-    val initialPage = remember(friends) { if (friends.isNotEmpty() && friends.size >= 3) 2 else 0 }
-    val pagerState =
-        rememberPagerState(friends.size, initialOffscreenLimit = 5, initialPage = initialPage)
+
     HorizontalPager(
         state = pagerState,
         modifier = Modifier

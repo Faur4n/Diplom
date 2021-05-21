@@ -25,8 +25,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import androidx.navigation.compose.navigate
-import androidx.navigation.compose.popUpTo
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieAnimationSpec
 import com.airbnb.lottie.compose.rememberLottieAnimationState
@@ -39,7 +37,6 @@ import com.fauran.diplom.navigation.LocalRootNavController
 import com.fauran.diplom.navigation.Nav
 import com.fauran.diplom.ui.theme.*
 import com.fauran.diplom.util.showToast
-import kotlinx.coroutines.delay
 import java.util.*
 
 @Composable

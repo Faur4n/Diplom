@@ -9,11 +9,8 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.navigation.compose.navigate
-import androidx.navigation.compose.popUpTo
 import com.fauran.diplom.navigation.LocalRootNavController
 import com.fauran.diplom.navigation.Nav
-import kotlinx.coroutines.delay
 
 @Composable
 fun SplashScreen(viewModel: SplashViewModel) {

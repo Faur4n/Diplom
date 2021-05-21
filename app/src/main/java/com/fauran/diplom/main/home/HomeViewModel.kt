@@ -2,29 +2,19 @@ package com.fauran.diplom.main.home
 
 import android.content.Context
 import android.util.Log
-import androidx.activity.ComponentActivity
 import androidx.activity.result.ActivityResultLauncher
 import androidx.lifecycle.*
 import androidx.navigation.NavController
-import androidx.navigation.compose.navigate
-import androidx.navigation.compose.popUpTo
 import com.fauran.diplom.SPOTIFY_SIGN_IN
 import com.fauran.diplom.TAG
-import com.fauran.diplom.VKCallback
-import com.fauran.diplom.VK_SIGN_IN
-import com.fauran.diplom.auth.widgets.vkScopes
 import com.fauran.diplom.local.Preferences.FirebaseToken
 import com.fauran.diplom.local.Preferences.SpotifyToken
 import com.fauran.diplom.local.Preferences.VKToken
 import com.fauran.diplom.local.Preferences.updatePreferences
-import com.fauran.diplom.main.VkApi
-import com.fauran.diplom.main.VkApi.toRelatedFriends
-import com.fauran.diplom.main.VkApi.toSuggestion
+import com.fauran.diplom.main.vk_api.VkApi
 import com.fauran.diplom.models.*
 import com.fauran.diplom.navigation.Nav
 import com.fauran.diplom.network.SpotifyApi
-import com.fauran.diplom.util.isSpotifyUser
-import com.fauran.diplom.util.isVkUser
 import com.fauran.diplom.util.saveSpotifyToken
 import com.fauran.diplom.util.saveVkToken
 import com.google.firebase.auth.ktx.auth
@@ -35,57 +25,46 @@ import com.google.firebase.ktx.Firebase
 import com.skydoves.sandwich.*
 import com.spotify.sdk.android.authentication.AuthenticationResponse
 import com.vk.api.sdk.VK
-import com.vk.api.sdk.VKTokenExpiredHandler
 import com.vk.api.sdk.auth.VKAccessToken
-import com.vk.api.sdk.auth.VKAuthCallback
-import com.vk.sdk.api.newsfeed.dto.NewsfeedGetSuggestedSourcesResponse
-import com.vk.sdk.api.users.dto.UsersSubscriptionsItem
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.tasks.await
 import java.util.*
 import javax.inject.Inject
-import kotlin.reflect.KFunction
-import kotlin.reflect.KSuspendFunction0
 
-sealed class HomeStatus {
-    object Loading : HomeStatus()
-    object FirstLaunch : HomeStatus()
-    data class Error(val msg: String) : HomeStatus()
-    data class Data(val user: User) : HomeStatus()
-    object NotAuthorized : HomeStatus()
-}
-class DeferredFunction(val function: KFunction<Any>, vararg val params: Any?)  {
-    @Suppress("UNCHECKED_CAST")
-    operator fun invoke(): Any? {
-        return function.call(params)
-    }
-}
+//sealed class HomeStatus {
+//    object Loading : HomeStatus()
+//    object FirstLaunch : HomeStatus()
+//    data class Error(val msg: String) : HomeStatus()
+//    data class Data(val user: User) : HomeStatus()
+//    object NotAuthorized : HomeStatus()
+//}
+
+data class HomeState(
+    val user: User? = null,
+    val error: String? = null,
+    val logout: Boolean = false
+)
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val spotifyApi: SpotifyApi
+    private val spotifyApi: SpotifyApi,
+    private val homeUseCase: HomeUseCase
 ) : ViewModel() {
 
-    private val _status = MutableLiveData<HomeStatus>(HomeStatus.Loading)
-    val status: LiveData<HomeStatus> = _status
+    private val _state = MutableLiveData(HomeState())
+    val state: LiveData<HomeState> = _state
+
     private val db = Firebase.firestore
     private val auth = Firebase.auth
     private var currentUser: User? = null
     private var userListener: ListenerRegistration? = null
-
     private val _isRefreshing = MutableLiveData<Boolean>()
     val isRefreshing: LiveData<Boolean> = _isRefreshing
-
-    private val _isVkEnabled = MutableLiveData<Boolean>(false)
-    val isVkEnabled: LiveData<Boolean> = _isVkEnabled
-
-    private val _isSpotifyEnabled = MutableLiveData<Boolean>(false)
-    val isSpotifyEnabled: LiveData<Boolean> = _isSpotifyEnabled
     private var spotifyLauncher: ActivityResultLauncher<Int>? = null
-    private var vkLauncher: ActivityResultLauncher<Int>? = null
-
-//    var lastFunction : DeferredFunction? = null
+    private var downloadJob: Job? = null
+    private val _showGenres = MutableLiveData<HomeScreen.Genres?>()
+    val showGenres: LiveData<HomeScreen.Genres?> = _showGenres
 
     fun init(spotifyLauncher: ActivityResultLauncher<Int>) {
         this.spotifyLauncher = spotifyLauncher
@@ -93,44 +72,38 @@ class HomeViewModel @Inject constructor(
             Log.d(TAG, "isFirstLaunch: ${auth.currentUser}")
             val uuid = auth.currentUser?.uid
             if (uuid == null) {
-                _status.postValue(HomeStatus.NotAuthorized)
+                updateState(logout = true)
                 return@launch
             }
             listenUser(uuid)
         }
     }
 
-    fun handleVkToken(activity: ComponentActivity, vkCallback: VKCallback) {
-        VK.addTokenExpiredHandler(object : VKTokenExpiredHandler {
-            override fun onTokenExpired() {
-                vkLauncher?.launch(VK_SIGN_IN)
-                VK.login(activity, vkScopes)
-            }
-        })
-        vkCallback.registerForCallback(object : VKAuthCallback {
-            override fun onLogin(token: VKAccessToken) {
-                val accessToken = token.accessToken
-                viewModelScope.launch {
-                    saveVkToken(activity, accessToken)
-                }
-            }
+    private fun updateState(user: User? = null, error: String? = null, logout: Boolean? = null) {
+        val state = state.value
+        _state.postValue(
+            HomeState(
+                user = user ?: state?.user,
+                error = error ?: state?.error,
+                logout = logout ?: state?.logout ?: false
+            )
+        )
+    }
 
-            override fun onLoginFailed(errorCode: Int) {
-                viewModelScope.launch {
-                    val userAccounts = currentUser?.accounts?.toMutableList()
-                    userAccounts?.removeAll {
-                        it.type == ACC_TYPE_VK
-                    }
-                    val newUser = currentUser?.copy(
-                        accounts = userAccounts
-                    )
-                    if (newUser != null) {
-                        saveUser(newUser)
-                    }
-                    Log.d(TAG, "getMusicData: CANT GET VK")
-                }
+    fun removeVkAccount() {
+        viewModelScope.launch {
+            val userAccounts = currentUser?.accounts?.toMutableList()
+            userAccounts?.removeAll {
+                it.type == ACC_TYPE_VK
             }
-        })
+            val newUser = currentUser?.copy(
+                accounts = userAccounts
+            )
+            if (newUser != null) {
+                saveUser(newUser)
+            }
+            Log.d(TAG, "getMusicData: CANT GET VK")
+        }
     }
 
     private fun listenUser(uuid: String) {
@@ -138,76 +111,50 @@ class HomeViewModel @Inject constructor(
             userListener = db.collection("users/").whereEqualTo("gkey", uuid)
                 .addSnapshotListener { value, error ->
                     if (error != null) {
-                        _status.postValue(HomeStatus.NotAuthorized)
+                        updateState(logout = true)
                     }
                     val user = value?.toObjects<User>()?.firstOrNull()
                     if (user != null) {
                         currentUser = user
-
-                        var vk = false
-                        var spotify = false
-                        user.accounts?.forEach {
-                            when (it.type) {
-                                ACC_TYPE_SPOTIFY -> {
-                                    spotify = true
-                                }
-                                ACC_TYPE_VK -> {
-                                    vk = true
-                                }
-                            }
-                        }
-
-                        val isSpotifyEnabled = isSpotifyUser || spotify
-                        val isVkEnabled = isVkUser || vk
-                        if (!isVkEnabled) {
+                        if (!user.isVkEnabled) {
                             VK.logout()
                         }
+                        Log.d(
+                            TAG,
+                            "listenUser: VK ${user.isVkEnabled} SPOT ${user.isSpotifyEnabled}"
+                        )
                         val music = user.music
-                        if (isSpotifyEnabled && (user.music == null || music == null || music.isEmpty())) {
-                                updateUserMusic()
+                        if (user.isSpotifyEnabled && (user.music == null || music == null || music.isEmpty())) {
+                            updateUserMusic()
+                            return@addSnapshotListener
                         }
                         val friends = user.friends
-                        if (isVkEnabled && (friends == null || friends.isEmpty())) {
-                            viewModelScope.launch {
-                                updateUserFriends()
-                            }
+                        if (user.isVkEnabled && (friends == null || friends.isEmpty())) {
+                            updateUserFriends()
+                            return@addSnapshotListener
                         }
-
-                        _isSpotifyEnabled.postValue(isSpotifyEnabled)
-                        _isVkEnabled.postValue(isVkEnabled)
-
-                        _status.postValue(HomeStatus.Data(user))
+                        updateState(user = user)
                     } else {
-                        _status.postValue(HomeStatus.FirstLaunch)
                         createUserOnFirstLaunch(uuid)
                     }
                 }
         }
     }
 
-    suspend fun updateUserFriends() = coroutineScope {
-        _isRefreshing.postValue(true)
-        val suggestion = async {
-            getSuggestions()
+    private fun updateUserFriends() {
+        viewModelScope.launch {
+            _isRefreshing.postValue(true)
+            try {
+                homeUseCase.updateVkData(currentUser)
+            } catch (th: Throwable) {
+                Log.d(TAG, "updateUserFriends: $th")
+            }
+            _isRefreshing.postValue(false)
         }
-        Log.d(TAG, "updateUserFriends: $suggestion")
-        val friends = async {
-            getFriendsData()
-        }
-        val user = currentUser
-        if (user != null) {
-            val newUser = user.copy(
-                friends = friends.await(),
-                suggestions = suggestion.await()
-            )
-            saveUser(newUser)
-        }
-        _isRefreshing.postValue(false)
     }
 
-    fun updateUserMusic() {
+    private fun updateUserMusic() {
         viewModelScope.launch {
-//            lastFunction = DeferredFunction(this@HomeViewModel::updateUserMusic)
             _isRefreshing.postValue(true)
             Log.d(TAG, "updateUserMusic: UPDATE MUSIC")
             val musicData = getMusicData()
@@ -219,7 +166,6 @@ class HomeViewModel @Inject constructor(
             }
             _isRefreshing.postValue(false)
         }
-
     }
 
     private fun createUserOnFirstLaunch(uuid: String) {
@@ -245,31 +191,21 @@ class HomeViewModel @Inject constructor(
             if (token != null) {
                 saveSpotifyToken(context, token)
                 refresh()
-//                lastFunction?.invoke()
-//                getMusicData()
             }
         }
     }
 
-
-
-    suspend fun getMusicData(): List<MusicData>? {
+    private suspend fun getMusicData(): List<MusicData>? {
         var result: List<MusicData>? = null
         spotifyApi.getTopArtists().onError {
-            handleSpotifyAuthError()
+            val err = handleSpotifyAuthError(spotifyLauncher)
+            updateState(error = err)
         }.onSuccess {
             result = data?.items?.map { it.mapToData() }
         }
         return result
     }
 
-    suspend fun getFriendsData(): List<RelatedFriend> {
-        return VkApi.getRelatedFriends().items.map { it.toRelatedFriends() }
-    }
-
-    suspend fun getSuggestions(): List<Suggestion>? {
-        return VkApi.getNewsSuggestions().items?.map { it.toSuggestion() }
-    }
 
     private suspend fun saveUser(user: User) {
         kotlin.runCatching {
@@ -303,12 +239,12 @@ class HomeViewModel @Inject constructor(
 
     fun connectSpotify(context: Context, response: AuthenticationResponse?) {
         if (response == null || response.type != AuthenticationResponse.Type.TOKEN) {
-            sendError("Bad spotify reponse")
+            updateState(error = "Bad spotify reponse")
             return
         }
         val token = response.accessToken
         if (token == null) {
-            sendError("Empty spotify token")
+            updateState(error = "Empty spotify token")
             return
         }
         Log.d(TAG, "authWithSpotifyToken: SPOTIFY TOKEN $token")
@@ -320,6 +256,7 @@ class HomeViewModel @Inject constructor(
                     Log.d(TAG, "authWithSpotifyToken: $me")
                 }
             }.onError {
+                updateState(error = message())
                 Log.d(TAG, "authWithSpotifyToken: ${this.message()}")
             }
         }
@@ -350,7 +287,6 @@ class HomeViewModel @Inject constructor(
         photoUrl: String?,
     ) {
         //get vk data
-
         val curUser = currentUser
         Log.d(TAG, "saveVkAccount: $curUser")
         if (curUser != null) {
@@ -383,22 +319,18 @@ class HomeViewModel @Inject constructor(
             }
         }
     }
-    private var downloadJob : Job? = null
-    private val _showGenres = MutableLiveData<HomeScreen.Genres?>()
-    val showGenres: LiveData<HomeScreen.Genres?> = _showGenres
 
-    fun consumeGenres(){
+    fun consumeGenres() {
         _showGenres.postValue(null)
     }
 
-    fun downloadGenreInfo(genre: Genre){
-//        lastFunction = DeferredFunction(this@HomeViewModel::downloadGenreInfo)
+    fun downloadGenreInfo(genre: Genre) {
         downloadJob?.cancel()
         downloadJob = viewModelScope.launch {
             spotifyApi.getGenreInfo(genre).suspendOnSuccess {
                 Log.d(TAG, "downloadGenreInfo: $data")
                 val items = data?.artists?.items
-                if(items != null && items.isNotEmpty()){
+                if (items != null && items.isNotEmpty()) {
                     _showGenres.postValue(
                         HomeScreen.Genres(
                             genre,
@@ -407,32 +339,20 @@ class HomeViewModel @Inject constructor(
                     )
                 }
             }.onError {
-                handleSpotifyAuthError()
+                val err = handleSpotifyAuthError(spotifyLauncher)
+                updateState(error = err)
             }
         }
     }
 
-    private fun ApiResponse.Failure.Error<*>.handleSpotifyAuthError(){
-        if (statusCode.code == 401 || statusCode.code == 400) {
-            spotifyLauncher?.launch(SPOTIFY_SIGN_IN)
-        }else{
-            sendError(errorBody?.string().toString())
-        }
-    }
 
     fun refresh() {
-        if (isSpotifyEnabled.value == true) {
+        if (currentUser?.isSpotifyEnabled == true) {
             updateUserMusic()
         }
-        viewModelScope.launch {
-            if (isVkEnabled.value == true) {
-                updateUserFriends()
-            }
+        if (currentUser?.isVkEnabled == true) {
+            updateUserFriends()
         }
-    }
-
-    fun sendError(msg: String) {
-        _status.postValue(HomeStatus.Error(msg))
     }
 
     override fun onCleared() {

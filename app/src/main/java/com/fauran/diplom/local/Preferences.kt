@@ -15,7 +15,6 @@ object Preferences {
     val SpotifyToken = stringPreferencesKey("spotify_auth_token")
     val VKToken = stringPreferencesKey("vk_auth_token")
     val FirebaseToken = stringPreferencesKey("fb_token")
-
     fun <T>Context.getPreferences(key: Preferences.Key<T>): Flow<T?> {
         return dataStore.data.map {
             it[key]

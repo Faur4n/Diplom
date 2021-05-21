@@ -1,4 +1,5 @@
 <resources>
+    <integer name="com_vk_sdk_AppId">7843673</integer>
     <string name="app_name">Diplom</string>
     <string name="login_error">Не удалось авторизироваться</string>
     <string name="auth_title">Finder</string>
@@ -16,4 +17,5 @@
     <string name="genres_screen_title">Популярные исполнители</string>
     <string name="hello">Привет!</string>
     <string name="description">Найди для себя что-то новенькое</string>
+    <string name="share_you_interests">Поделитесь своими интересами!\nЭто даст вам возможность найти друзей по интересам.</string>
 </resources>

@@ -11,7 +11,9 @@ import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Done
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -29,10 +31,6 @@ import com.fauran.diplom.auth.widgets.SpotifySignInButton
 import com.fauran.diplom.auth.widgets.VkSignInButton
 import com.fauran.diplom.main.home.AvatarImage
 import com.fauran.diplom.main.home.HomeViewModel
-import com.fauran.diplom.main.home.LocalSpotifyEnabled
-import com.fauran.diplom.main.home.LocalVkEnabled
-import com.fauran.diplom.models.ACC_TYPE_SPOTIFY
-import com.fauran.diplom.models.ACC_TYPE_VK
 import com.fauran.diplom.models.User
 import com.fauran.diplom.ui.theme.Green500
 import com.fauran.diplom.ui.theme.Typography
@@ -46,10 +44,6 @@ fun CardItem(
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
-
-    val spotifyConnected  = LocalSpotifyEnabled.current
-
-    val vkConnected = LocalVkEnabled.current
     val animatedProgress = remember { Animatable(initialValue = 0.8f) }
     LaunchedEffect(Unit) {
         animatedProgress.animateTo(
@@ -58,7 +52,7 @@ fun CardItem(
         )
     }
     Card(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .clip(RoundedCornerShape(10.dp))
             .shadow(32.dp)
@@ -90,7 +84,7 @@ fun CardItem(
 
             Text(text = "Вы вошли через $type.\nВойдите через другие соцсети, чтобы получать больше рекомендаций.")
             Spacer(modifier = Modifier.size(16.dp))
-            if (spotifyConnected) {
+            if (user?.isSpotifyEnabled == true) {
                 Row() {
                     Row(modifier = Modifier.weight(1f)) {
                         Text(
@@ -115,7 +109,7 @@ fun CardItem(
                 })
             }
             Spacer(modifier = Modifier.size(16.dp))
-            if (vkConnected) {
+            if (user?.isVkEnabled == true) {
                 Row() {
                     Row(modifier = Modifier.weight(1f)) {
                         Image(

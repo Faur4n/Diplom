@@ -1,4 +1,4 @@
-package com.fauran.diplom.main
+package com.fauran.diplom.main.vk_api
 
 import android.util.Log
 import com.fauran.diplom.TAG
@@ -47,7 +47,6 @@ object VkApi {
     suspend fun getRelatedFriends() =
         suspendCoroutine<FriendsGetSuggestionsResponse> { continuation ->
             val random = Random.nextInt(0, 100)
-            Log.d(TAG, "getRelatedFriends: $random")
             VK.execute(
                 FriendsService().friendsGetSuggestions(
                     filter = listOf(
@@ -94,7 +93,6 @@ object VkApi {
         )
 
     }
-
 
     suspend fun getNewsSuggestions() =
         suspendCoroutine<NewsfeedGetSuggestedSourcesResponse> { continuation ->

@@ -39,3 +39,17 @@ suspend fun saveVkToken(context: Context, token: String) {
 val isSpotifyUser get() = Firebase.auth.currentUser?.uid?.startsWith("spotify") == true
 
 val isVkUser get() = Firebase.auth.currentUser?.uid?.startsWith("VK") == true
+
+
+inline fun <reified T> List<*>.ifListOf(block: (List<T>) -> Unit) {
+    if (isNotEmpty() && first() is T) {
+        kotlin.runCatching {
+            map {
+                it as T
+            }
+        }.onSuccess {
+            block(it)
+        }
+    }
+}
+
