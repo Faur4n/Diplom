@@ -1,11 +1,14 @@
 package com.fauran.diplom.main.home.list_items
 
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -20,6 +23,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.fauran.diplom.R
@@ -45,12 +49,20 @@ fun MusicItem(
             animationSpec = tween(300, easing = LinearEasing)
         )
     }
+    val context = LocalContext.current
     Box(
         modifier = modifier
             .fillMaxHeight()
             .padding(14.dp)
             .width(150.dp)
             .graphicsLayer(scaleY = animatedProgress.value, scaleX = animatedProgress.value)
+            .clickable {
+                val uri = item.uri
+                if(uri != null){
+                    val launcher = Intent(Intent.ACTION_VIEW, Uri.parse(uri))
+                    context.startActivity(launcher)
+                }
+            }
 
     ) {
         Image(

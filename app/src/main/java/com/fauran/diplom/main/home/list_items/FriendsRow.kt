@@ -40,7 +40,6 @@ fun FriendsRow(
     friends: List<RelatedFriend>,
     pagerState: PagerState
 ) {
-
     HorizontalPager(
         state = pagerState,
         modifier = Modifier

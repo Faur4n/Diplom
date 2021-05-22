@@ -1,4 +1,4 @@
-package com.fauran.diplom.main.home
+package com.fauran.diplom.main.home.genres_screen
 
 import android.content.Intent
 import android.net.Uri
@@ -24,11 +24,9 @@ import androidx.compose.ui.unit.dp
 import coil.transform.CircleCropTransformation
 import com.fauran.diplom.R
 import com.fauran.diplom.main.home.list_items.ItemTitle
+import com.fauran.diplom.main.home.utils.Genre
 import com.fauran.diplom.models.SpotifyArtist
-import com.fauran.diplom.ui.theme.Typography
-import com.fauran.diplom.ui.theme.defaultThemeColor
-import com.fauran.diplom.ui.theme.spotifyBlack
-import com.fauran.diplom.ui.theme.white
+import com.fauran.diplom.ui.theme.*
 import com.google.accompanist.coil.rememberCoilPainter
 import java.util.*
 
@@ -51,7 +49,7 @@ fun GenresScreen(
                         Icon(imageVector = Icons.Default.ArrowBack, contentDescription = null)
                     }
                 },
-                modifier = Modifier.background(genre.color)
+                backgroundColor = genre.color
             )
         }
     ) {

@@ -125,31 +125,30 @@ object VkApi {
         }
 
 
-    fun UsersSubscriptionsItem.toSuggestion() : Suggestion{
-            return when(this){
-                is UsersSubscriptionsItem.UsersUserXtrType -> {
-                    Suggestion(
-                        firstName = firstName,
-                        lastName = lastName,
-                        id = id?.toString(),
-                        type = type?.name,
-                        screenName = screenName,
-                        photo = photo100
-                    )
-                }
-                is UsersSubscriptionsItem.GroupsGroupFull -> {
-                    Suggestion(
-                        city = city?.title,
-                        description = description,
-                        id = id?.toString(),
-                        name = name,
-                        type = type?.name,
-                        photo = photo200
-                    )
-                }
+    fun UsersSubscriptionsItem.toSuggestion(): Suggestion {
+        return when (this) {
+            is UsersSubscriptionsItem.UsersUserXtrType -> {
+                Suggestion(
+                    firstName = firstName,
+                    lastName = lastName,
+                    id = id?.toString(),
+                    type = type?.name,
+                    screenName = screenName,
+                    photo = photo100
+                )
             }
+            is UsersSubscriptionsItem.GroupsGroupFull -> {
+                Suggestion(
+                    city = city?.title,
+                    description = description,
+                    id = id?.toString(),
+                    name = name,
+                    type = type?.name,
+                    photo = photo200
+                )
+            }
+        }
     }
-
 
 
 }

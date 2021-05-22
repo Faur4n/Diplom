@@ -1,22 +1,29 @@
 package com.fauran.diplom.main.home
 
+import android.Manifest
 import android.content.Context
+import android.content.pm.PackageManager
 import android.util.Log
 import androidx.activity.result.ActivityResultLauncher
+import androidx.core.app.ActivityCompat
 import androidx.lifecycle.*
 import androidx.navigation.NavController
-import com.fauran.diplom.SPOTIFY_SIGN_IN
 import com.fauran.diplom.TAG
 import com.fauran.diplom.local.Preferences.FirebaseToken
 import com.fauran.diplom.local.Preferences.SpotifyToken
 import com.fauran.diplom.local.Preferences.VKToken
 import com.fauran.diplom.local.Preferences.updatePreferences
+import com.fauran.diplom.main.home.utils.ContextBus
+import com.fauran.diplom.main.home.utils.LocationBus
+import com.fauran.diplom.main.home.utils.handleSpotifyAuthError
 import com.fauran.diplom.main.vk_api.VkApi
 import com.fauran.diplom.models.*
 import com.fauran.diplom.navigation.Nav
 import com.fauran.diplom.network.SpotifyApi
 import com.fauran.diplom.util.saveSpotifyToken
 import com.fauran.diplom.util.saveVkToken
+import com.firebase.geofire.GeoFireUtils
+import com.firebase.geofire.GeoLocation
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.ktx.firestore
@@ -32,13 +39,6 @@ import kotlinx.coroutines.tasks.await
 import java.util.*
 import javax.inject.Inject
 
-//sealed class HomeStatus {
-//    object Loading : HomeStatus()
-//    object FirstLaunch : HomeStatus()
-//    data class Error(val msg: String) : HomeStatus()
-//    data class Data(val user: User) : HomeStatus()
-//    object NotAuthorized : HomeStatus()
-//}
 
 data class HomeState(
     val user: User? = null,
@@ -62,9 +62,7 @@ class HomeViewModel @Inject constructor(
     private val _isRefreshing = MutableLiveData<Boolean>()
     val isRefreshing: LiveData<Boolean> = _isRefreshing
     private var spotifyLauncher: ActivityResultLauncher<Int>? = null
-    private var downloadJob: Job? = null
     private val _showGenres = MutableLiveData<HomeScreen.Genres?>()
-    val showGenres: LiveData<HomeScreen.Genres?> = _showGenres
 
     fun init(spotifyLauncher: ActivityResultLauncher<Int>) {
         this.spotifyLauncher = spotifyLauncher
@@ -320,31 +318,42 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    fun consumeGenres() {
-        _showGenres.postValue(null)
-    }
-
-    fun downloadGenreInfo(genre: Genre) {
-        downloadJob?.cancel()
-        downloadJob = viewModelScope.launch {
-            spotifyApi.getGenreInfo(genre).suspendOnSuccess {
-                Log.d(TAG, "downloadGenreInfo: $data")
-                val items = data?.artists?.items
-                if (items != null && items.isNotEmpty()) {
-                    _showGenres.postValue(
-                        HomeScreen.Genres(
-                            genre,
-                            items
+    fun makeUserShared() {
+        val locationClient = LocationBus.getLocationClient()
+        val context = ContextBus.getContext()
+        if (context != null && ActivityCompat.checkSelfPermission(
+                context,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
+        ) {
+            locationClient?.lastLocation?.addOnSuccessListener { location ->
+                try {
+                    val geoHash = GeoFireUtils.getGeoHashForLocation(
+                        GeoLocation(
+                            location.latitude,
+                            location.longitude
                         )
                     )
+
+                    viewModelScope.launch {
+                        currentUser?.copy(
+                            shared = true,
+                            hash = geoHash,
+                            lat = location.latitude,
+                            lon = location.longitude
+                        )?.let {
+                            saveUser(
+                                it
+                            )
+                        }
+                    }
+                } catch (th: Throwable) {
+                    Log.d(TAG, "makeUserShared: ${th.message}")
                 }
-            }.onError {
-                val err = handleSpotifyAuthError(spotifyLauncher)
-                updateState(error = err)
+
             }
         }
     }
-
 
     fun refresh() {
         if (currentUser?.isSpotifyEnabled == true) {

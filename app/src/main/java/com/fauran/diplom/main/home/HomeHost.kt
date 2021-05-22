@@ -8,15 +8,22 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Logout
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import com.fauran.diplom.R
 import com.fauran.diplom.TAG
+import com.fauran.diplom.main.home.genres_screen.GenresScreen
 import com.fauran.diplom.main.home.list_items.*
+import com.fauran.diplom.main.home.utils.Genre
 import com.fauran.diplom.main.vk_api.VKTokenHandler
 import com.fauran.diplom.models.*
 import com.fauran.diplom.navigation.LocalRootNavController
@@ -29,6 +36,7 @@ sealed class HomeScreen {
     data class Genres(val genre: Genre, val artists: List<SpotifyArtist>) : HomeScreen()
     object Back : HomeScreen()
 }
+
 val LocalSpotifyLauncher = compositionLocalOf<ActivityResultLauncher<Int>?> { null }
 
 @ExperimentalPagerApi
@@ -84,31 +92,42 @@ fun HomeHost(
                 }
             }
             HomeScreen.Home -> {
-                Scaffold(
-                    scaffoldState = scaffoldState, drawerContent = {
-                        Button(onClick = {
-                            viewModel.logout(context, navController)
-                        }) {
-                            Text(text = "ВЫЙТИ")
-                        }
-                    }) {
-                    Crossfade(targetState = isLoading) { loading ->
-                        if (loading) {
-                            Box(modifier = Modifier.fillMaxSize()) {
-                                Column(modifier = Modifier.align(Center)) {
-                                    Text(
-                                        text = "Loading",
-                                        textAlign = TextAlign.Center,
-                                        modifier = Modifier.align(CenterHorizontally)
+                Crossfade(targetState = isLoading) { loading ->
+                    if (loading) {
+                        Box(modifier = Modifier.fillMaxSize()) {
+                            Column(modifier = Modifier.align(Center)) {
+                                Text(
+                                    text = "Loading",
+                                    textAlign = TextAlign.Center,
+                                    modifier = Modifier.align(CenterHorizontally)
+                                )
+                                LinearProgressIndicator(
+                                    modifier = Modifier.align(
+                                        CenterHorizontally
                                     )
-                                    LinearProgressIndicator(
-                                        modifier = Modifier.align(
-                                            CenterHorizontally
-                                        )
-                                    )
-                                }
+                                )
                             }
-                        } else {
+                        }
+                    } else {
+                        Scaffold(
+                            scaffoldState = scaffoldState,
+                            topBar = {
+                                TopAppBar(
+                                    title = { Text(text = stringResource(id = R.string.app_name)) },
+                                    elevation = 8.dp,
+                                    actions = {
+                                        IconButton(onClick = {
+                                            viewModel.logout(context, navController)
+                                        }) {
+                                            Icon(
+                                                imageVector = Icons.Default.Logout,
+                                                contentDescription = null
+                                            )
+                                        }
+                                    }
+                                )
+                            },
+                        ) {
                             val user = state?.user
                             if (user != null) {
                                 MainHomeScreen(
@@ -123,9 +142,7 @@ fun HomeHost(
                 }
             }
         }
-
     }
-
 }
 
 

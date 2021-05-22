@@ -7,8 +7,8 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.staticCompositionLocalOf
-import com.fauran.diplom.main.home.NavigationViewModel
-import com.fauran.diplom.main.home.ToastBus
+import com.fauran.diplom.main.home.utils.LocationBus
+import com.fauran.diplom.main.home.utils.ContextBus
 import com.fauran.diplom.main.vk_api.LocalVkCallback
 import com.fauran.diplom.main.vk_api.VKCallback
 import com.fauran.diplom.navigation.Navigation
@@ -17,11 +17,11 @@ import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import com.vk.api.sdk.VK
 import com.vk.api.sdk.VKApiConfig
-import com.vk.api.sdk.auth.VKAuthCallback
 import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
 
 
 val LocalGoogleSignInClient = staticCompositionLocalOf<GoogleSignInClient?> { null }
@@ -33,11 +33,19 @@ class MainActivity : ComponentActivity() {
     private val contextGetter = {
         this
     }
+    private var locationProvider: FusedLocationProviderClient? = null
+
+    private val locationGetter = {
+        locationProvider
+    }
+
     @ExperimentalFoundationApi
     @ExperimentalPagerApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        ToastBus.addToastContextHandler(contextGetter)
+        ContextBus.addToastContextHandler(contextGetter)
+        locationProvider = LocationServices.getFusedLocationProviderClient(this)
+        LocationBus.addLocationHandler(locationGetter)
         VK.setConfig(VKApiConfig(this,lang = "ru",appId = BuildConfig.VK_APP_ID))
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestEmail()
@@ -65,7 +73,8 @@ class MainActivity : ComponentActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        ToastBus.removeToastContextHandler(contextGetter)
+        ContextBus.removeToastContextHandler(contextGetter)
+        LocationBus.removeLocationHandler(locationGetter)
     }
 }
 

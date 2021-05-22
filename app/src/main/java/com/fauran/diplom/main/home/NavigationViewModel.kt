@@ -7,6 +7,9 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.fauran.diplom.TAG
+import com.fauran.diplom.main.home.utils.Genre
+import com.fauran.diplom.main.home.utils.ContextBus
+import com.fauran.diplom.main.home.utils.handleSpotifyAuthError
 import com.fauran.diplom.models.SpotifyArtist
 import com.fauran.diplom.network.SpotifyApi
 import com.skydoves.sandwich.onError
@@ -64,7 +67,7 @@ class NavigationViewModel @Inject constructor(
             if (items != null && items.isNotEmpty()) {
                 onResult(items)
             } else {
-                ToastBus.showToast("По данному жанру не удалось загрузить дополнительную информацию")
+                ContextBus.showToast("По данному жанру не удалось загрузить дополнительную информацию")
             }
         }.onError {
             handleSpotifyAuthError(spotifyLauncher)

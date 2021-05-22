@@ -10,7 +10,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.fauran.diplom.main.home.Genre
+import com.fauran.diplom.main.home.utils.Genre
 import com.fauran.diplom.ui.theme.Typography
 import com.fauran.diplom.ui.theme.spotifyBlack
 import com.google.accompanist.flowlayout.FlowRow
@@ -43,5 +43,4 @@ fun GenresItem(
             }
         }
     }
-
 }

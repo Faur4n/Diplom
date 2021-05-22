@@ -52,10 +52,11 @@ fun CardItem(
         )
     }
     Card(
+        elevation = 30.dp,
         modifier = modifier
             .fillMaxSize()
+            .padding(start = 8.dp,end = 8.dp,top = 8.dp)
             .clip(RoundedCornerShape(10.dp))
-            .shadow(32.dp)
             .graphicsLayer(scaleY = animatedProgress.value, scaleX = animatedProgress.value)
     ) {
         Column(

@@ -2,7 +2,7 @@ package com.fauran.diplom.models
 
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import com.fauran.diplom.main.home.BaseSection
+import com.fauran.diplom.main.home.utils.BaseSection
 import com.fauran.diplom.util.isSpotifyUser
 import com.fauran.diplom.util.isVkUser
 import com.google.firebase.firestore.PropertyName
@@ -54,7 +54,19 @@ data class User(
     var friends: List<RelatedFriend>? = null,
     @get:PropertyName("suggestions")
     @set:PropertyName("suggestions")
-    var suggestions: List<Suggestion>? = null
+    var suggestions: List<Suggestion>? = null,
+    @get:PropertyName("shared")
+    @set:PropertyName("shared")
+    var shared: Boolean = false,
+    @get:PropertyName("hash")
+    @set:PropertyName("hash")
+    var hash : String? = null,
+    @get:PropertyName("lat")
+    @set:PropertyName("lat")
+    var lat : Double? = null,
+    @get:PropertyName("lon")
+    @set:PropertyName("lon")
+    var lon :Double? = null,
 ) {
     val isVkEnabled: Boolean
         get() = accounts?.find {
@@ -65,8 +77,8 @@ data class User(
         get() = accounts?.find {
             it.type == ACC_TYPE_SPOTIFY
         } != null || isSpotifyUser
-
 }
+
 
 data class RelatedFriend(
     @get:PropertyName("firstName")
@@ -128,6 +140,9 @@ data class MusicData(
     @get:PropertyName("image_url")
     @set:PropertyName("image_url")
     var imageUrl: String? = null,
+    @get:PropertyName("uri")
+    @set:PropertyName("uri")
+    var uri: String? = null,
 ) : BaseSection()
 
 
@@ -139,13 +154,16 @@ data class SpotifyTopArtistsItem(
     var genres: List<String>?,
     var name: String?,
     @SerializedName("images")
-    var images: List<SpotifyImage>?
+    var images: List<SpotifyImage>?,
+    @SerializedName("uri")
+    var uri: String?= null
 ) {
     fun mapToData(): MusicData {
         return MusicData(
             genres = genres,
             name = name,
-            imageUrl = images?.firstOrNull()?.url
+            imageUrl = images?.firstOrNull()?.url,
+            uri = uri
         )
     }
 }
@@ -203,5 +221,9 @@ data class Suggestion(
     @get:PropertyName("photo")
     @set:PropertyName("photo")
     var photo: String? = null,
-) : BaseSection()
+) : BaseSection(){
+    fun hasSomething() : Boolean{
+        return firstName != null || city != null || description != null || lastName != null || name != null || screenName != null
+    }
+}
 

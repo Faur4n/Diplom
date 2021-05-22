@@ -1,4 +1,4 @@
-package com.fauran.diplom.main.home
+package com.fauran.diplom.main.home.utils
 
 import android.content.Context
 import android.widget.Toast
@@ -14,8 +14,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.fauran.diplom.R
 import com.fauran.diplom.SPOTIFY_SIGN_IN
+import com.fauran.diplom.models.RelatedFriend
 import com.fauran.diplom.models.User
 import com.fauran.diplom.util.getMatColor
+import com.google.android.gms.location.FusedLocationProviderClient
 import com.skydoves.sandwich.ApiResponse
 import java.util.*
 
@@ -79,6 +81,10 @@ fun User.createSections(context: Context): List<Section> {
     return sections
 }
 
+fun Section.hasFriends() : Boolean{
+    return items.filterIsInstance<RelatedFriend>().isNotEmpty()
+}
+
 data class Section(
     @StringRes val title: Int,
     val items: List<BaseSection>,
@@ -101,9 +107,9 @@ fun ApiResponse.Failure.Error<*>.handleSpotifyAuthError(launcher: ActivityResult
     return errorBody?.string().toString()
 }
 
-class ToastBus {
+class ContextBus {
     companion object {
-        val listeners: MutableList<() -> Context?> = mutableListOf()
+        private val listeners: MutableList<() -> Context?> = mutableListOf()
 
         fun showToast(msg: String) {
             val anyContext = listeners.mapNotNull {
@@ -113,11 +119,37 @@ class ToastBus {
                 Toast.makeText(anyContext, msg, Toast.LENGTH_SHORT).show()
         }
 
+        fun getContext() : Context?{
+            return listeners.mapNotNull {
+                it.invoke()
+            }.firstOrNull()
+        }
+
         fun addToastContextHandler(contextGetter: () -> Context) {
             listeners.add(contextGetter)
         }
 
         fun removeToastContextHandler(contextGetter: () -> Context) {
+            listeners.remove(contextGetter)
+        }
+    }
+}
+
+class LocationBus {
+    companion object {
+        private val listeners: MutableList<() -> FusedLocationProviderClient?> = mutableListOf()
+
+        fun getLocationClient(): FusedLocationProviderClient? {
+            return listeners.mapNotNull {
+                it.invoke()
+            }.firstOrNull()
+        }
+
+        fun addLocationHandler(contextGetter: () -> FusedLocationProviderClient?) {
+            listeners.add(contextGetter)
+        }
+
+        fun removeLocationHandler(contextGetter: () -> FusedLocationProviderClient?) {
             listeners.remove(contextGetter)
         }
     }

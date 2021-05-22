@@ -1,6 +1,7 @@
 package com.fauran.diplom.main
 
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -48,6 +49,7 @@ fun MainGraph(){
                     ) {
                         viewModel.handleNewSpotifyToken(navController.context, it)
                     }
+
                     LaunchedEffect(Unit) {
                         viewModel.init(spot)
                         navViewModel.init(spot)

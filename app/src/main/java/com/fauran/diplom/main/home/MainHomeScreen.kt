@@ -1,25 +1,32 @@
 package com.fauran.diplom.main.home
 
+import android.Manifest
+import android.content.pm.PackageManager
 import android.util.Log
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.core.app.ActivityCompat
 import com.fauran.diplom.TAG
 import com.fauran.diplom.main.home.list_items.*
+import com.fauran.diplom.main.home.utils.ContextBus
+import com.fauran.diplom.main.home.utils.Genre
+import com.fauran.diplom.main.home.utils.createSections
 import com.fauran.diplom.models.MusicData
 import com.fauran.diplom.models.RelatedFriend
 import com.fauran.diplom.models.Suggestion
@@ -46,7 +53,7 @@ fun MainHomeScreen(
     val sections = remember(user) {
         user.createSections(context)
     }
-    val friends = remember(sections){
+    val friends = remember(sections) {
         val list = sections.filterNot {
             it.items.filterIsInstance<RelatedFriend>().isEmpty()
         }.firstOrNull()
@@ -58,12 +65,27 @@ fun MainHomeScreen(
         rememberPagerState(friends.size, initialOffscreenLimit = 5, initialPage = initialPage)
 
 
+    val (havePermission, setHavePermission) = remember {
+        mutableStateOf(
+            ActivityCompat.checkSelfPermission(
+                context,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
+
+        )
+    }
+
+    val location = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) {
+        setHavePermission(it)
+    }
+
     SwipeRefresh(
         state = rememberSwipeRefreshState(isRefreshing),
         onRefresh = {
             viewModel.refresh()
         }) {
-
         LazyColumn(
             state = listState,
             contentPadding = PaddingValues(bottom = 32.dp),
@@ -76,17 +98,26 @@ fun MainHomeScreen(
                 .fillMaxSize()
         ) {
             item {
-                TextBlock()
-            }
-            item {
                 CardItem(
                     user = user,
                     viewModel,
                 )
             }
             item {
-                ShareButton(modifier = Modifier.fillMaxWidth()) {
+                val shared = user.shared
+                ShareButton(shared, modifier = Modifier.fillMaxWidth()) {
+                    Log.d(TAG, "MainHomeScreen: $shared $havePermission")
+                    if (shared) {
 
+                    } else {
+                        if(havePermission){
+                            viewModel.makeUserShared()
+                        }else{
+                            Log.d(TAG, "MainHomeScreen: LAUNCH ")
+                            location.launch(Manifest.permission.ACCESS_COARSE_LOCATION)
+//                            ContextBus.showToast("NEED PERMISSION OR CONTINUE")
+                        }
+                    }
                 }
             }
             sections.forEach { section ->
@@ -126,14 +157,16 @@ fun MainHomeScreen(
                 }
                 items.ifListOf<RelatedFriend> { friends ->
                     item() {
-                        FriendsRow(friends = friends,pagerState)
+                        FriendsRow(friends = friends, pagerState)
                     }
                 }
-                items.ifListOf<Suggestion> {
-                    item {
-                        Text(text = it.toString())
+                items.ifListOf<Suggestion> { suggestions ->
+                    items(suggestions) {
+                        if (it.hasSomething())
+                            SuggestionCard(suggestion = it, modifier = Modifier.fillMaxWidth())
                     }
                 }
+
             }
         }
     }

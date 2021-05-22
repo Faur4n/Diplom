@@ -1,6 +1,6 @@
 <resources>
     <integer name="com_vk_sdk_AppId">7843673</integer>
-    <string name="app_name">Diplom</string>
+    <string name="app_name">Finder Diplom</string>
     <string name="login_error">Не удалось авторизироваться</string>
     <string name="auth_title">Finder</string>
     <string name="google_sign_in">Войти через Google</string>
@@ -18,4 +18,7 @@
     <string name="hello">Привет!</string>
     <string name="description">Найди для себя что-то новенькое</string>
     <string name="share_you_interests">Поделитесь своими интересами!\nЭто даст вам возможность найти друзей по интересам.</string>
+    <string name="interests_title">Вам доступен уникальный подбор рекомендаций! Ура!</string>
+    <string name="interests_btn_title">Перейти</string>
+    <string name="share">Поделиться</string>
 </resources>

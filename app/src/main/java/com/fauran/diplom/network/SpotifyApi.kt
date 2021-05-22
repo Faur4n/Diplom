@@ -1,6 +1,6 @@
 package com.fauran.diplom.network
 
-import com.fauran.diplom.main.home.Genre
+import com.fauran.diplom.main.home.utils.Genre
 import com.fauran.diplom.models.SearchArtistResponse
 import com.skydoves.sandwich.ApiResponse
 
