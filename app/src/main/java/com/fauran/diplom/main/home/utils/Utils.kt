@@ -19,6 +19,7 @@ import com.fauran.diplom.models.User
 import com.fauran.diplom.util.getMatColor
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.skydoves.sandwich.ApiResponse
+import kotlinx.serialization.Serializable
 import java.util.*
 
 val emptySection = Section(
@@ -84,19 +85,17 @@ fun User.createSections(context: Context): List<Section> {
 fun Section.hasFriends() : Boolean{
     return items.filterIsInstance<RelatedFriend>().isNotEmpty()
 }
-
 data class Section(
     @StringRes val title: Int,
     val items: List<BaseSection>,
     val icon: ImageVector,
     val id: String = UUID.randomUUID().toString(),
 )
-
 data class Genre(
     val name: String,
     val color: Color
 ) : BaseSection()
-
+@Serializable
 abstract class BaseSection()
 
 

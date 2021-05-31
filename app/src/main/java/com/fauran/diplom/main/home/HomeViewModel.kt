@@ -22,8 +22,8 @@ import com.fauran.diplom.navigation.Nav
 import com.fauran.diplom.network.SpotifyApi
 import com.fauran.diplom.util.saveSpotifyToken
 import com.fauran.diplom.util.saveVkToken
-import com.firebase.geofire.GeoFireUtils
-import com.firebase.geofire.GeoLocation
+import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.tasks.CancellationTokenSource
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.ktx.firestore
@@ -36,9 +36,9 @@ import com.vk.api.sdk.auth.VKAccessToken
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.tasks.await
+import kotlinx.serialization.Serializable
 import java.util.*
 import javax.inject.Inject
-
 
 data class HomeState(
     val user: User? = null,
@@ -63,6 +63,7 @@ class HomeViewModel @Inject constructor(
     val isRefreshing: LiveData<Boolean> = _isRefreshing
     private var spotifyLauncher: ActivityResultLauncher<Int>? = null
     private val _showGenres = MutableLiveData<HomeScreen.Genres?>()
+    private val tokenSrc = CancellationTokenSource()
 
     fun init(spotifyLauncher: ActivityResultLauncher<Int>) {
         this.spotifyLauncher = spotifyLauncher
@@ -326,32 +327,30 @@ class HomeViewModel @Inject constructor(
                 Manifest.permission.ACCESS_COARSE_LOCATION
             ) == PackageManager.PERMISSION_GRANTED
         ) {
-            locationClient?.lastLocation?.addOnSuccessListener { location ->
-                try {
-                    val geoHash = GeoFireUtils.getGeoHashForLocation(
-                        GeoLocation(
-                            location.latitude,
-                            location.longitude
-                        )
-                    )
-
-                    viewModelScope.launch {
-                        currentUser?.copy(
-                            shared = true,
-                            hash = geoHash,
-                            lat = location.latitude,
-                            lon = location.longitude
-                        )?.let {
-                            saveUser(
-                                it
-                            )
-                        }
+            locationClient
+                ?.getCurrentLocation(
+                    LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY,
+                    tokenSrc.token
+                )
+                ?.addOnSuccessListener { location ->
+                    try {
+                            currentUser?.copy(
+                                shared = true,
+                                location = Location(
+                                    location.latitude,
+                                    location.longitude
+                                )
+                            )?.let {
+                                viewModelScope.launch {
+                                    saveUser(
+                                        it
+                                    )
+                                }
+                            }
+                    } catch (th: Throwable) {
+                        Log.d(TAG, "makeUserShared: ${th.message}")
                     }
-                } catch (th: Throwable) {
-                    Log.d(TAG, "makeUserShared: ${th.message}")
                 }
-
-            }
         }
     }
 
@@ -367,5 +366,6 @@ class HomeViewModel @Inject constructor(
     override fun onCleared() {
         super.onCleared()
         userListener?.remove()
+        tokenSrc.cancel()
     }
 }

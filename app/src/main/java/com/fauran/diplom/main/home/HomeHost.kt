@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.result.ActivityResultLauncher
 import androidx.compose.animation.Crossfade
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -23,6 +24,8 @@ import com.fauran.diplom.R
 import com.fauran.diplom.TAG
 import com.fauran.diplom.main.home.genres_screen.GenresScreen
 import com.fauran.diplom.main.home.list_items.*
+import com.fauran.diplom.main.home.recommendations.RecData
+import com.fauran.diplom.main.home.recommendations.RecommendationScreen
 import com.fauran.diplom.main.home.utils.Genre
 import com.fauran.diplom.main.vk_api.VKTokenHandler
 import com.fauran.diplom.models.*
@@ -34,11 +37,13 @@ import soup.compose.material.motion.materialElevationScale
 sealed class HomeScreen {
     object Home : HomeScreen()
     data class Genres(val genre: Genre, val artists: List<SpotifyArtist>) : HomeScreen()
+    data class Recommendations(val data: List<RecData>) : HomeScreen()
     object Back : HomeScreen()
 }
 
 val LocalSpotifyLauncher = compositionLocalOf<ActivityResultLauncher<Int>?> { null }
 
+@ExperimentalAnimationApi
 @ExperimentalPagerApi
 @ExperimentalFoundationApi
 @Composable
@@ -140,6 +145,17 @@ fun HomeHost(
                         }
                     }
                 }
+            }
+            is HomeScreen.Recommendations -> {
+                val user = state?.user
+                if (user != null) {
+                    RecommendationScreen(user, onSearchChanged = {
+
+                    }) {
+                        navigationViewModel.navigateHome()
+                    }
+                }
+
             }
         }
     }

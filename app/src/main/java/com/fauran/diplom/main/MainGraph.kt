@@ -2,6 +2,7 @@ package com.fauran.diplom.main
 
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -25,6 +26,7 @@ import javax.inject.Inject
 
 val LocalMainNavController = staticCompositionLocalOf<NavController?>{ null }
 
+@ExperimentalAnimationApi
 @ExperimentalPagerApi
 @ExperimentalFoundationApi
 @Composable

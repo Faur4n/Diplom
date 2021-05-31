@@ -108,7 +108,7 @@ fun MainHomeScreen(
                 ShareButton(shared, modifier = Modifier.fillMaxWidth()) {
                     Log.d(TAG, "MainHomeScreen: $shared $havePermission")
                     if (shared) {
-
+                        navigationViewModel.navigateToRecommendations()
                     } else {
                         if(havePermission){
                             viewModel.makeUserShared()

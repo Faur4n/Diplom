@@ -46,9 +46,16 @@ class NavigationViewModel @Inject constructor(
         }
     }
 
+    fun navigateToRecommendations() {
+        _currentScreen.postValue(HomeScreen.Recommendations(emptyList()))
+    }
+
     fun goBack() {
         when (currentScreen.value) {
             is HomeScreen.Genres -> {
+                navigateHome()
+            }
+            is HomeScreen.Recommendations -> {
                 navigateHome()
             }
             HomeScreen.Home -> {

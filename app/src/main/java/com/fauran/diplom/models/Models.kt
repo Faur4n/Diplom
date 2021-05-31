@@ -7,6 +7,8 @@ import com.fauran.diplom.util.isSpotifyUser
 import com.fauran.diplom.util.isVkUser
 import com.google.firebase.firestore.PropertyName
 import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
 const val ACC_TYPE_SPOTIFY = "spotify"
 const val ACC_TYPE_VK = "vk"
@@ -52,21 +54,21 @@ data class User(
     @get:PropertyName("friends")
     @set:PropertyName("friends")
     var friends: List<RelatedFriend>? = null,
+    @get:PropertyName("searchable_friends")
+    @set:PropertyName("searchable_friends")
+    var searchableFriends: List<SearchableFriend>? = null,
     @get:PropertyName("suggestions")
     @set:PropertyName("suggestions")
     var suggestions: List<Suggestion>? = null,
+    @get:PropertyName("searchable_suggestions")
+    @set:PropertyName("searchable_suggestions")
+    var searchableSuggestions: List<SearchableSuggestion>? = null,
     @get:PropertyName("shared")
     @set:PropertyName("shared")
     var shared: Boolean = false,
-    @get:PropertyName("hash")
-    @set:PropertyName("hash")
-    var hash : String? = null,
-    @get:PropertyName("lat")
-    @set:PropertyName("lat")
-    var lat : Double? = null,
-    @get:PropertyName("lon")
-    @set:PropertyName("lon")
-    var lon :Double? = null,
+    @get:PropertyName("_geoloc")
+    @set:PropertyName("_geoloc")
+    var location : Location? = null,
 ) {
     val isVkEnabled: Boolean
         get() = accounts?.find {
@@ -79,6 +81,14 @@ data class User(
         } != null || isSpotifyUser
 }
 
+data class Location(
+    @get:PropertyName("lat")
+    @set:PropertyName("lat")
+    var lat : Double? = null,
+    @get:PropertyName("lng")
+    @set:PropertyName("lng")
+    var lng : Double?= null
+)
 
 data class RelatedFriend(
     @get:PropertyName("firstName")
@@ -109,6 +119,26 @@ data class RelatedFriend(
     @set:PropertyName("id")
     var id: String? = null
 ) : BaseSection()
+data class SearchableFriend(
+    @get:PropertyName("firstName")
+    @set:PropertyName("firstName")
+    var firstName: String? = null,
+    @get:PropertyName("lastName")
+    @set:PropertyName("lastName")
+    var lastName: String? = null,
+    @get:PropertyName("sex")
+    @set:PropertyName("sex")
+    var sex: String? = null,
+    @get:PropertyName("city")
+    @set:PropertyName("city")
+    var city: String? = null,
+    @get:PropertyName("country")
+    @set:PropertyName("country")
+    var country: String? = null,
+    @get:PropertyName("id")
+    @set:PropertyName("id")
+    var id: String? = null
+) : BaseSection()
 
 
 data class Account(
@@ -129,7 +159,6 @@ data class Account(
     var photoUrl: String? = null
 )
 
-
 data class MusicData(
     @get:PropertyName("genres")
     @set:PropertyName("genres")
@@ -145,17 +174,15 @@ data class MusicData(
     var uri: String? = null,
 ) : BaseSection()
 
-
 data class SpotifyTopArtistsResponse(
     val items: List<SpotifyTopArtistsItem>? = null
 )
-
 data class SpotifyTopArtistsItem(
     var genres: List<String>?,
     var name: String?,
-    @SerializedName("images")
+    @SerialName("images")
     var images: List<SpotifyImage>?,
-    @SerializedName("uri")
+    @SerialName("uri")
     var uri: String?= null
 ) {
     fun mapToData(): MusicData {
@@ -167,23 +194,19 @@ data class SpotifyTopArtistsItem(
         )
     }
 }
-
 data class SearchArtistResponse(
     val artists: SpotifyArtists
 )
-
 data class SpotifyArtists(
     val items: List<SpotifyArtist>
 )
-
 data class SpotifyArtist(
-    @SerializedName("uri")
+    @SerialName("uri")
     val uri: String? = null,
     val name: String? = null,
     val images: List<SpotifyImage>? = null,
     val id: String? = null
 )
-
 
 data class ThemeColor(
     val light: Color,
@@ -191,7 +214,6 @@ data class ThemeColor(
     val dark: Color,
     val gradient: Brush
 )
-
 
 data class Suggestion(
     @get:PropertyName("firstName")
@@ -226,4 +248,18 @@ data class Suggestion(
         return firstName != null || city != null || description != null || lastName != null || name != null || screenName != null
     }
 }
-
+data class SearchableSuggestion(
+    @get:PropertyName("firstName")
+    @set:PropertyName("firstName")
+    var firstName: String? = null,
+    @get:PropertyName("lastName")
+    @set:PropertyName("lastName")
+    var lastName: String? = null,
+    var name: String? = null,
+    @get:PropertyName("type")
+    @set:PropertyName("type")
+    var type: String? = null,
+    @get:PropertyName("id")
+    @set:PropertyName("id")
+    var id: String? = null,
+) : BaseSection()

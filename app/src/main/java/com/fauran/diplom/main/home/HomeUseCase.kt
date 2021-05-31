@@ -5,13 +5,10 @@ import com.fauran.diplom.TAG
 import com.fauran.diplom.main.vk_api.VkApi
 import com.fauran.diplom.main.vk_api.VkApi.toRelatedFriends
 import com.fauran.diplom.main.vk_api.VkApi.toSuggestion
-import com.fauran.diplom.models.RelatedFriend
-import com.fauran.diplom.models.Suggestion
-import com.fauran.diplom.models.User
+import com.fauran.diplom.models.*
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import dagger.hilt.android.scopes.ViewModelScoped
-import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
@@ -22,16 +19,33 @@ class HomeUseCase @Inject constructor() {
 
     suspend fun updateVkData(user: User?) {
         coroutineScope {
-            val suggestion = async {
-                getSuggestions()
-            }
-            val friends = async {
-                getFriendsData()
-            }
+            val suggestion = getSuggestions()
+
+            val friends = getFriendsData()
+
             if (user != null) {
                 val newUser = user.copy(
-                    friends = friends.await(),
-                    suggestions = suggestion.await()
+                    friends = friends,
+                    searchableFriends = friends.map {
+                        SearchableFriend(
+                            it.firstName,
+                            it.lastName,
+                            it.sex,
+                            it.city,
+                            it.country,
+                            it.id
+                        )
+                    },
+                    suggestions = suggestion,
+                    searchableSuggestions = suggestion?.map {
+                        SearchableSuggestion(
+                            it.firstName,
+                            it.lastName,
+                            it.name,
+                            it.type,
+                            it.id
+                        )
+                    },
                 )
                 saveUser(newUser)
             }

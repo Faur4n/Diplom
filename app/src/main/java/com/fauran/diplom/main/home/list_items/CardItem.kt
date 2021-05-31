@@ -31,6 +31,7 @@ import com.fauran.diplom.auth.widgets.SpotifySignInButton
 import com.fauran.diplom.auth.widgets.VkSignInButton
 import com.fauran.diplom.main.home.AvatarImage
 import com.fauran.diplom.main.home.HomeViewModel
+import com.fauran.diplom.main.home.utils.Shimmer
 import com.fauran.diplom.models.User
 import com.fauran.diplom.ui.theme.Green500
 import com.fauran.diplom.ui.theme.Typography
@@ -55,7 +56,7 @@ fun CardItem(
         elevation = 30.dp,
         modifier = modifier
             .fillMaxSize()
-            .padding(start = 8.dp,end = 8.dp,top = 8.dp)
+            .padding(start = 8.dp, end = 8.dp, top = 8.dp)
             .clip(RoundedCornerShape(10.dp))
             .graphicsLayer(scaleY = animatedProgress.value, scaleX = animatedProgress.value)
     ) {
@@ -133,4 +134,5 @@ fun CardItem(
             }
         }
     }
+
 }
