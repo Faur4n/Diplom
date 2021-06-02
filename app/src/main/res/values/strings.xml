@@ -22,4 +22,6 @@
     <string name="interests_btn_title">Перейти</string>
     <string name="share">Поделиться</string>
     <string name="recommendations">Рекомендации</string>
+    <string name="same_friends">%d общих друзей</string>
+    <string name="same_suggestion">%d общих интересов в ВК</string>
 </resources>

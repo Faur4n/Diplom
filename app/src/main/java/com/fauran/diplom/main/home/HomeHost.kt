@@ -24,8 +24,8 @@ import com.fauran.diplom.R
 import com.fauran.diplom.TAG
 import com.fauran.diplom.main.home.genres_screen.GenresScreen
 import com.fauran.diplom.main.home.list_items.*
-import com.fauran.diplom.main.home.recommendations.RecData
 import com.fauran.diplom.main.home.recommendations.RecommendationScreen
+import com.fauran.diplom.main.home.recommendations.models.RecData
 import com.fauran.diplom.main.home.utils.Genre
 import com.fauran.diplom.main.vk_api.VKTokenHandler
 import com.fauran.diplom.models.*
@@ -37,7 +37,7 @@ import soup.compose.material.motion.materialElevationScale
 sealed class HomeScreen {
     object Home : HomeScreen()
     data class Genres(val genre: Genre, val artists: List<SpotifyArtist>) : HomeScreen()
-    data class Recommendations(val data: List<RecData>) : HomeScreen()
+    object Recommendations : HomeScreen()
     object Back : HomeScreen()
 }
 

@@ -47,7 +47,7 @@ class NavigationViewModel @Inject constructor(
     }
 
     fun navigateToRecommendations() {
-        _currentScreen.postValue(HomeScreen.Recommendations(emptyList()))
+        _currentScreen.postValue(HomeScreen.Recommendations)
     }
 
     fun goBack() {

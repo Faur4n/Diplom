@@ -3,10 +3,7 @@ package com.fauran.diplom.main.home.recommendations
 import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
@@ -21,6 +18,9 @@ import com.algolia.search.model.IndexName
 import com.algolia.search.model.search.Query
 import com.fauran.diplom.BuildConfig
 import com.fauran.diplom.TAG
+import com.fauran.diplom.main.home.recommendations.models.Intersection
+import com.fauran.diplom.main.home.recommendations.models.RecData
+import com.fauran.diplom.main.home.recommendations.models.RecommendationUser
 import com.fauran.diplom.models.User
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.firestore.ktx.toObject
@@ -30,7 +30,19 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
-class RecommendationViewModel : ViewModel() {
+
+class RecommendationViewModelFactory(
+    val user: User
+) : ViewModelProvider.Factory{
+    override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+        return modelClass.getConstructor(User::class.java).newInstance(user)
+    }
+
+}
+
+class RecommendationViewModel(
+    val user: User
+) : ViewModel() {
 
     private val store = Firebase.firestore
 
@@ -53,7 +65,12 @@ class RecommendationViewModel : ViewModel() {
         searcher = searcher,
         transformer = { response ->
             response.hits.deserialize(RecData.serializer()).mapNotNull {
-                getUser(it.id)
+                val newUser = getUser(it.id) ?: return@mapNotNull null
+                val intersections = RecUtils.findIntersections(newUser,user)
+                RecommendationUser(
+                    newUser,
+                    intersections
+                )
             }
         }
     )
@@ -108,57 +125,4 @@ class RecommendationViewModel : ViewModel() {
         searcher.cancel()
     }
 }
-
-
-public interface SearchBoxCompose : SearchBoxView {
-
-    /**
-     * Search box query.
-     */
-    public val query: MutableState<String>
-
-    /**
-     * the callback to be triggered on text update
-     */
-    public fun onValueChange(query: String, isSubmit: Boolean)
-}
-
-/**
- * Creates an instance of [SearchBoxCompose].
- *
- * @param query mutable state holding the query
- */
-public fun SearchBoxCompose(query: MutableState<String>): SearchBoxCompose {
-    return SearchBoxComposeImpl(query)
-}
-
-/**
- * Creates an instance of [SearchBoxCompose].
- *
- * @param query default query value
- */
-public fun SearchBoxCompose(query: String = ""): SearchBoxCompose {
-    return SearchBoxComposeImpl(mutableStateOf(query))
-}
-
-internal class SearchBoxComposeImpl(
-    override val query: MutableState<String>
-) : SearchBoxCompose {
-
-    override var onQueryChanged: Callback<String?>? = null
-    override var onQuerySubmitted: Callback<String?>? = null
-
-    override fun setText(text: String?, submitQuery: Boolean) {
-        query.value = text ?: ""
-    }
-
-    override fun onValueChange(query: String, isSubmit: Boolean) {
-        val onQuery = if (isSubmit) onQuerySubmitted else onQueryChanged
-        onQuery?.invoke(query)
-    }
-}
-
-public typealias Callback<T> = ((T) -> Unit)
-
-
 
