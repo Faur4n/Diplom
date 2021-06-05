@@ -64,7 +64,7 @@ fun AuthScreen(viewModel: AuthViewModel) {
             }
             AuthStatus.Success -> {
                 navController?.navigate(Nav.Main.route) {
-                    popUpTo(Nav.Auth.route) {
+                    popUpTo(Nav.Main.route) {
                         inclusive = true
                     }
                 }

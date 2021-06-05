@@ -32,7 +32,7 @@ import kotlinx.coroutines.tasks.await
 
 
 class RecommendationViewModelFactory(
-    val user: User
+    val user: User?
 ) : ViewModelProvider.Factory{
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
         return modelClass.getConstructor(User::class.java).newInstance(user)
@@ -41,7 +41,7 @@ class RecommendationViewModelFactory(
 }
 
 class RecommendationViewModel(
-    val user: User
+    val user: User?
 ) : ViewModel() {
 
     private val store = Firebase.firestore
@@ -84,15 +84,6 @@ class RecommendationViewModel(
         }
     }
 
-    fun loadUsers(items: List<RecData>) {
-        viewModelScope.launch {
-            val users = items.mapNotNull {
-                getUser(it.id)
-            }
-            _users.postValue(users)
-        }
-    }
-
     suspend fun getUser(id: String): User? {
         Log.d(TAG, "getUser: USER WITH ID $id")
         val user = store.document("users/$id").get().await().toObject<User>()
@@ -100,10 +91,10 @@ class RecommendationViewModel(
         return user
     }
 
-    fun getCategories(user: User) {
+    fun getCategories(user: User?) {
         viewModelScope.launch {
             val cities = mutableSetOf<String>()
-            user.friends?.forEach {
+            user?.friends?.forEach {
                 val city = it.city
                 if (city != null) {
                     cities.add(city)

@@ -1,4 +1,4 @@
-package com.fauran.diplom.main.home
+package com.fauran.diplom.main.home.utils
 
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
@@ -20,7 +20,7 @@ fun BackHandler(
             }
         }
     }
-    DisposableEffect(dispatcher, routeState) {
+    DisposableEffect(routeState) {
         dispatcher?.onBackPressedDispatcher?.addCallback(backCallback)
         onDispose {
             backCallback.remove()

@@ -20,7 +20,6 @@ fun VKTokenHandler(viewModel: HomeViewModel) {
     val vkCallback = LocalVkCallback.current
     val activity = LocalContext.current as? ComponentActivity
     DisposableEffect(activity) {
-        Log.d(TAG, "VKTokenHandler: THIS IS CALLED ")
         val handler = object : VKTokenExpiredHandler {
             override fun onTokenExpired() {
                 Log.d(TAG, "onTokenExpired: EXPIRED")

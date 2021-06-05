@@ -22,12 +22,14 @@ import com.fauran.diplom.main.home.recommendations.models.RecommendationUser
 import com.fauran.diplom.models.MusicData
 import com.fauran.diplom.models.RelatedFriend
 import com.fauran.diplom.models.Suggestion
+import com.fauran.diplom.ui.theme.Typography
 import com.google.accompanist.coil.rememberCoilPainter
 
 @Composable
 fun RecommendationItem(
     recUser: RecommendationUser?,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onDetailsClick : (isUser : String) -> Unit,
 ) {
     val context = LocalContext.current
 
@@ -67,7 +69,7 @@ fun RecommendationItem(
                         if (intersection.friends.isNotEmpty())
                             SameFriendsRow(
                                 friends = intersection.friends,
-                                modifier = Modifier.padding(start = 8.dp)
+                                modifier = Modifier.padding(start = 8.dp, end = 8.dp)
                             )
                     }
                     is Intersection.MusicIntersection -> {
@@ -84,10 +86,16 @@ fun RecommendationItem(
                     }
                 }
             }
-            TextButton(onClick = {
-                Toast.makeText(context, "ПОДРОБНЕЕ", Toast.LENGTH_SHORT).show()
-            }, modifier = Modifier.align(Alignment.End)) {
-                Text(text = "Подробнее")
+            TextButton(
+                onClick = {
+                    recUser?.user?.gkey?.let {
+                        onDetailsClick(it)
+                    }
+                }, modifier = Modifier
+                    .align(Alignment.End)
+                    .padding(8.dp)
+            ) {
+                Text(text = stringResource(id = R.string.more), style = Typography.button,modifier = Modifier.padding(8.dp))
             }
         }
     }
@@ -100,8 +108,14 @@ fun SameMusicRow(
 ) {
     LazyRow(
         horizontalArrangement = Arrangement.spacedBy((-16).dp),
-        modifier = modifier
+        modifier = modifier,
+        verticalAlignment = Alignment.CenterVertically
     ) {
+        item{
+            Text(text = stringResource(id = R.string.same_music,music.size),modifier = Modifier.fillMaxWidth())
+            Spacer(modifier = Modifier.size(16.dp))
+
+        }
         items(music) {
             val paint =
                 rememberCoilPainter(request = it.imageUrl, requestBuilder = {
@@ -121,29 +135,26 @@ fun SameFriendsRow(
     friends: List<RelatedFriend>,
     modifier: Modifier = Modifier
 ) {
-    Row(modifier = modifier) {
-        Text(
-            text = stringResource(R.string.same_friends, friends.size),
-            modifier = Modifier
-                .align(Alignment.CenterVertically)
-                .weight(1f)
-        )
-        Spacer(modifier = Modifier.size(16.dp))
-        Row(horizontalArrangement = Arrangement.spacedBy((-16).dp)) {
-            friends.take(3).forEach {
-                val paint =
-                    rememberCoilPainter(request = it.photo, requestBuilder = {
-                        transformations(CircleCropTransformation())
-                    })
-                Image(
-                    painter = paint,
-                    contentDescription = null,
-                    modifier = Modifier.size(48.dp)
-                )
-            }
+    LazyRow(
+        horizontalArrangement = Arrangement.spacedBy((-16).dp),
+        modifier = modifier,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        item{
+            Text(text = stringResource(id = R.string.same_friends,friends.size),modifier = Modifier.fillMaxWidth())
+            Spacer(modifier = Modifier.size(16.dp))
+
         }
-        if (friends.size > 3) {
-            Text(text = "...")
+        items(friends) { item ->
+            val paint =
+                rememberCoilPainter(request = item.photo, requestBuilder = {
+                    transformations(CircleCropTransformation())
+                })
+            Image(
+                painter = paint,
+                contentDescription = null,
+                modifier = Modifier.size(48.dp)
+            )
         }
     }
 }

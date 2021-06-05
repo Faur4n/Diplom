@@ -24,4 +24,7 @@
     <string name="recommendations">Рекомендации</string>
     <string name="same_friends">%d общих друзей</string>
     <string name="same_suggestion">%d общих интересов в ВК</string>
+    <string name="same_music">%d общих исполнителей</string>
+    <string name="more">Подробнее</string>
+    <string name="user_title">Пользователь</string>
 </resources>

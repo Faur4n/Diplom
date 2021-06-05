@@ -6,15 +6,15 @@ import com.fauran.diplom.models.User
 class RecUtils {
 
     companion object{
-        fun findIntersections(user: User,secondUser: User,maxCount: Int = 6): List<Intersection> {
-            val music = user.music?.intersect(
-                secondUser.music ?: emptyList()
+        fun findIntersections(user: User?,secondUser: User?,maxCount: Int = 6): List<Intersection> {
+            val music = user?.music?.intersect(
+                secondUser?.music ?: emptyList()
             )?.toList() ?: emptyList()
-            val suggestions = user.suggestions?.intersect(
-                secondUser.suggestions ?: emptyList()
+            val suggestions = user?.suggestions?.intersect(
+                secondUser?.suggestions ?: emptyList()
             )?.toList() ?: emptyList()
-            val friends = user.friends?.intersect(
-                secondUser.friends ?: emptyList()
+            val friends = user?.friends?.intersect(
+                secondUser?.friends ?: emptyList()
             )?.toList() ?: emptyList()
             return listOf(
                 Intersection.MusicIntersection(music),

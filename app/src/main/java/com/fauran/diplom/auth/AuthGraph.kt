@@ -8,7 +8,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.fauran.diplom.navigation.Screen
+import com.fauran.diplom.navigation.Roots
 
 val LocalAuthNavController  = staticCompositionLocalOf<NavController?> { null }
 
@@ -18,8 +18,8 @@ fun AuthGraph(){
     CompositionLocalProvider(
         LocalAuthNavController provides navController
     ) {
-        NavHost(navController = navController, startDestination = Screen.Auth.route){
-            composable(Screen.Auth.route){
+        NavHost(navController = navController, startDestination = Roots.Auth.route){
+            composable(Roots.Auth.route){
                 val viewModel : AuthViewModel = hiltViewModel()
                 AuthScreen(viewModel = viewModel)
             }

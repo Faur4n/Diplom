@@ -14,6 +14,7 @@ import com.fauran.diplom.local.Preferences.SpotifyToken
 import com.fauran.diplom.local.Preferences.VKToken
 import com.fauran.diplom.local.Preferences.updatePreferences
 import com.fauran.diplom.main.home.utils.ContextBus
+import com.fauran.diplom.main.home.utils.Genre
 import com.fauran.diplom.main.home.utils.LocationBus
 import com.fauran.diplom.main.home.utils.handleSpotifyAuthError
 import com.fauran.diplom.main.vk_api.VkApi
@@ -35,8 +36,8 @@ import com.vk.api.sdk.VK
 import com.vk.api.sdk.auth.VKAccessToken
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.tasks.await
-import kotlinx.serialization.Serializable
 import java.util.*
 import javax.inject.Inject
 
@@ -46,14 +47,19 @@ data class HomeState(
     val logout: Boolean = false
 )
 
+data class GenreState(
+    val genre: Genre,
+    val artists: List<SpotifyArtist>
+)
+
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val spotifyApi: SpotifyApi,
     private val homeUseCase: HomeUseCase
 ) : ViewModel() {
 
-    private val _state = MutableLiveData(HomeState())
-    val state: LiveData<HomeState> = _state
+    private val _state = MutableStateFlow(HomeState())
+    val state = _state.asStateFlow()
 
     private val db = Firebase.firestore
     private val auth = Firebase.auth
@@ -62,9 +68,12 @@ class HomeViewModel @Inject constructor(
     private val _isRefreshing = MutableLiveData<Boolean>()
     val isRefreshing: LiveData<Boolean> = _isRefreshing
     private var spotifyLauncher: ActivityResultLauncher<Int>? = null
-    private val _showGenres = MutableLiveData<HomeScreen.Genres?>()
     private val tokenSrc = CancellationTokenSource()
 
+    private val _genreState = MutableSharedFlow<GenreState?>(1)
+    val genreState = _genreState.asSharedFlow()
+
+    @ExperimentalCoroutinesApi
     fun init(spotifyLauncher: ActivityResultLauncher<Int>) {
         this.spotifyLauncher = spotifyLauncher
         viewModelScope.launch {
@@ -80,13 +89,15 @@ class HomeViewModel @Inject constructor(
 
     private fun updateState(user: User? = null, error: String? = null, logout: Boolean? = null) {
         val state = state.value
-        _state.postValue(
-            HomeState(
-                user = user ?: state?.user,
-                error = error ?: state?.error,
-                logout = logout ?: state?.logout ?: false
+        viewModelScope.launch {
+            _state.emit(
+                HomeState(
+                    user = user ?: state?.user,
+                    error = error ?: state?.error,
+                    logout = logout ?: state?.logout ?: false
+                )
             )
-        )
+        }
     }
 
     fun removeVkAccount() {
@@ -334,19 +345,19 @@ class HomeViewModel @Inject constructor(
                 )
                 ?.addOnSuccessListener { location ->
                     try {
-                            currentUser?.copy(
-                                shared = true,
-                                location = Location(
-                                    location.latitude,
-                                    location.longitude
+                        currentUser?.copy(
+                            shared = true,
+                            location = Location(
+                                location.latitude,
+                                location.longitude
+                            )
+                        )?.let {
+                            viewModelScope.launch {
+                                saveUser(
+                                    it
                                 )
-                            )?.let {
-                                viewModelScope.launch {
-                                    saveUser(
-                                        it
-                                    )
-                                }
                             }
+                        }
                     } catch (th: Throwable) {
                         Log.d(TAG, "makeUserShared: ${th.message}")
                     }
@@ -362,6 +373,39 @@ class HomeViewModel @Inject constructor(
             updateUserFriends()
         }
     }
+
+    fun goToGenres(genre: Genre) {
+        viewModelScope.launch {
+            downloadGenre(genre) { list ->
+                _genreState.emit(GenreState(genre, list))
+            }
+        }
+    }
+
+    private suspend fun downloadGenre(
+        genre: Genre,
+        onResult: suspend (List<SpotifyArtist>) -> Unit
+    ) {
+        spotifyApi.getGenreInfo(genre).suspendOnSuccess {
+            Log.d(TAG, "downloadGenreInfo: $data")
+            val items = data?.artists?.items
+            if (items != null && items.isNotEmpty()) {
+                onResult(items)
+            } else {
+                ContextBus.showToast("По данному жанру не удалось загрузить дополнительную информацию")
+            }
+        }.onError {
+            handleSpotifyAuthError(spotifyLauncher)
+        }
+    }
+
+    fun consumeGenreState(navController: NavController?) {
+        viewModelScope.launch {
+            _genreState.emit(null)
+            navController?.popBackStack()
+        }
+    }
+
 
     override fun onCleared() {
         super.onCleared()

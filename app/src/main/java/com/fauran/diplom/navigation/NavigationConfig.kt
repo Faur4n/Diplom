@@ -4,14 +4,22 @@ sealed class Nav(
     val startDestination: String,
     val route: String,
 ) {
-    object Auth : Nav(Screen.Auth.route, "auth_nav")
-    object Splash : Nav(Screen.Loading.route, "splash_nav")
-    object Main : Nav(Screen.HomeScreen.route, "main_nav")
+    object Auth : Nav(Roots.Auth.route, "auth_nav")
+    object Splash : Nav(Roots.Loading.route, "splash_nav")
+    object Main : Nav(Roots.Home.route, "main_nav")
 }
 
 
-sealed class Screen(val route: String) {
-    object Auth : Screen("auth")
-    object Loading : Screen("loading")
-    object HomeScreen : Screen("home_screen")
+sealed class Roots(val route: String) {
+    object Auth : Roots("auth")
+    object Loading : Roots("loading")
+    object Home : Roots("home")
+    object Recommendations : Roots("recommendation")
 }
+
+sealed class Screens(val route: String){
+    object HomeScreen : Screens("home_screen")
+    object GenreScreen : Screens("genres_screen")
+    object RecommendationScreen : Screens("recommendation_screen")
+}
+
