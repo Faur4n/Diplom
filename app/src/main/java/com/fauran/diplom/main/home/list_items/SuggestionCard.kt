@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.Card
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -22,6 +23,7 @@ import com.fauran.diplom.ui.theme.Typography
 import com.google.accompanist.coil.rememberCoilPainter
 import com.vk.sdk.api.users.dto.UsersUserType
 
+@ExperimentalMaterialApi
 @Composable
 fun SuggestionCard(
     suggestion: Suggestion,
@@ -29,7 +31,7 @@ fun SuggestionCard(
 ) {
     val context = LocalContext.current
     Card(
-        modifier = modifier.clickable {
+        onClick = {
             val id = suggestion.id
             if (id != null) {
                 val launcher = if (suggestion.type == UsersUserType.PROFILE.name) {
@@ -45,7 +47,8 @@ fun SuggestionCard(
                 }
                 context.startActivity(launcher)
             }
-        }
+        },
+        modifier = modifier
     ) {
         Row() {
             val paint = rememberCoilPainter(request = suggestion.photo ?: R.drawable.ic_image)

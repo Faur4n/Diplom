@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -34,6 +35,7 @@ import com.google.accompanist.pager.*
 import kotlin.math.absoluteValue
 
 
+@ExperimentalMaterialApi
 @ExperimentalPagerApi
 @Composable
 fun FriendsRow(
@@ -61,20 +63,20 @@ fun FriendsRow(
         Card(
             elevation = 32.dp,
             shape = RoundedCornerShape(16.dp),
+            onClick = {
+                val id = friend.id
+                Log.d(TAG, "FriendsRow: $id")
+                if (id != null) {
+                    val launcher = Intent(
+                        Intent.ACTION_VIEW,
+                        Uri.parse("vkontakte://profile/${id}")
+                    )
+                    context.startActivity(launcher)
+                }
+            },
             modifier = Modifier
                 .width(250.dp)
                 .clipToBounds()
-                .clickable {
-                    val id = friend.id
-                    Log.d(TAG, "FriendsRow: $id")
-                    if (id != null) {
-                        val launcher = Intent(
-                            Intent.ACTION_VIEW,
-                            Uri.parse("vkontakte://profile/${id}")
-                        )
-                        context.startActivity(launcher)
-                    }
-                }
                 .graphicsLayer {
                     // Calculate the absolute offset for the current page from the
                     // scroll position. We use the absolute value which allows us to mirror

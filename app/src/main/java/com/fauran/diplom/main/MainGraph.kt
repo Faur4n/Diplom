@@ -24,18 +24,15 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.fauran.diplom.TAG
 import com.fauran.diplom.auth.contracts.SpotifySignInContract
 import com.fauran.diplom.main.home.HomeScreen
 import com.fauran.diplom.main.home.HomeViewModel
-import com.fauran.diplom.main.home.ListSaver
-import com.fauran.diplom.main.home.ListState
 import com.fauran.diplom.main.home.genres_screen.GenresScreen
-import com.fauran.diplom.main.home.recommendations.RecommendationList
 import com.fauran.diplom.main.home.recommendations.RecommendationScreen
 import com.fauran.diplom.navigation.LocalRootNavController
 import com.fauran.diplom.navigation.Roots
 import com.fauran.diplom.navigation.Screens
+import com.fauran.diplom.util.rememberLazyListStateSavable
 import com.google.accompanist.pager.ExperimentalPagerApi
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 
@@ -76,6 +73,7 @@ fun NavStateController(
     content()
 }
 
+@ExperimentalMaterialApi
 @ExperimentalCoroutinesApi
 @ExperimentalAnimationApi
 @ExperimentalPagerApi
@@ -94,22 +92,7 @@ fun MainGraph() {
     LaunchedEffect(Unit) {
         viewModel?.init(spotifyHandler)
     }
-    val (listStateSaver, saveListState) = rememberSaveable(saver = ListSaver) {
-        mutableStateOf(ListState())
-    }
-    val listState = rememberLazyListState(
-        listStateSaver.initialFirstVisibleItemIndex,
-        listStateSaver.initialFirstVisibleItemScrollOffset
-    )
 
-    LaunchedEffect(listState) {
-        saveListState(
-            ListState(
-                listState.firstVisibleItemIndex,
-                listState.firstVisibleItemScrollOffset
-            )
-        )
-    }
     CompositionLocalProvider(
         LocalMainNavController provides navController
     ) {
@@ -138,8 +121,9 @@ fun MainGraph() {
                 }
             }
         }) {
-            NavHost(navController = navController, startDestination = Roots.Home.route,modifier = Modifier.padding(it)) {
+            val listState = rememberLazyListStateSavable()
 
+            NavHost(navController = navController, startDestination = Roots.Home.route,modifier = Modifier.padding(it)) {
                 composable(Roots.Home.route) {
                     val homeNavController = rememberNavController()
                     NavStateController(homeState,homeNavController){

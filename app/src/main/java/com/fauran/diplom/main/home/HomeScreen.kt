@@ -1,6 +1,5 @@
 package com.fauran.diplom.main.home
 
-import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -9,12 +8,14 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Logout
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.saveable.Saver
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
@@ -36,6 +37,7 @@ import com.fauran.diplom.navigation.LocalRootNavController
 import com.fauran.diplom.navigation.Screens
 import com.fauran.diplom.ui.theme.defaultThemeColor
 import com.fauran.diplom.util.ifListOf
+import com.fauran.diplom.util.rememberLazyListStateSavable
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.rememberPagerState
 import com.google.accompanist.swiperefresh.SwipeRefresh
@@ -45,19 +47,7 @@ import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
-val json = Json { }
-val ListSaver: Saver<MutableState<ListState>, out Any> = Saver(
-    save = {
-        json.encodeToString(it.value)
-    },
-    restore = { mutableStateOf(json.decodeFromString(it)) }
-)
-@Serializable
-data class ListState(
-    val initialFirstVisibleItemIndex: Int = 0,
-    val initialFirstVisibleItemScrollOffset: Int = 0
-)
-
+@ExperimentalMaterialApi
 @ExperimentalPagerApi
 @ExperimentalFoundationApi
 @Composable

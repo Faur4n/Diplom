@@ -2,6 +2,7 @@ package com.fauran.diplom.navigation
 
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.staticCompositionLocalOf
@@ -18,6 +19,7 @@ import com.google.accompanist.pager.ExperimentalPagerApi
 
 val LocalRootNavController = staticCompositionLocalOf<NavController?> { null }
 
+@ExperimentalMaterialApi
 @ExperimentalAnimationApi
 @ExperimentalFoundationApi
 @ExperimentalPagerApi
