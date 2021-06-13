@@ -1,4 +1,4 @@
-package com.fauran.diplom.main
+package com.fauran.diplom.navigation
 
 import android.os.Bundle
 import android.util.Log
@@ -104,7 +104,6 @@ fun MainGraph() {
             mutableStateOf(Bundle())
         }
 
-
         Scaffold(bottomBar = {
             val currentScreen by navController.currentBackStackEntryAsState()
             BottomNavigation() {
@@ -122,7 +121,6 @@ fun MainGraph() {
             }
         }) {
             val listState = rememberLazyListStateSavable()
-
             NavHost(navController = navController, startDestination = Roots.Home.route,modifier = Modifier.padding(it)) {
                 composable(Roots.Home.route) {
                     val homeNavController = rememberNavController()
@@ -132,7 +130,6 @@ fun MainGraph() {
                             startDestination = Screens.HomeScreen.route
                         ) {
                             composable(Screens.HomeScreen.route) {
-
                                 if (viewModel != null) {
                                     HomeScreen(viewModel = viewModel,navController = homeNavController,listState)
                                 }

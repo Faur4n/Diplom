@@ -1,6 +1,7 @@
 package com.fauran.diplom
 
 import android.content.Context
+import com.fauran.diplom.main.home.HomeUseCase
 import com.fauran.diplom.network.SpotifyApi
 import com.fauran.diplom.network.SpotifyApiService
 import com.fauran.diplom.network.SpotifyAuthInterceptor
@@ -28,7 +29,6 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object AppModule {
     private const val SPOTIFY_BASE_URL = "https://api.spotify.com/v1/"
-
 
     @ExperimentalSerializationApi
     @Singleton
@@ -78,4 +78,9 @@ object AppModule {
     @Singleton
     fun provideSpotifyAuthInterceptor(@ApplicationContext context: Context) : SpotifyAuthInterceptor =
         SpotifyAuthInterceptor(context)
+
+    @Provides
+    @Singleton
+    fun provideHomeUseCase() : HomeUseCase =
+        HomeUseCase()
 }

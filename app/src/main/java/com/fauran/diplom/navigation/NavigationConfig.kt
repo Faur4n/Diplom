@@ -9,7 +9,6 @@ sealed class Nav(
     object Main : Nav(Roots.Home.route, "main_nav")
 }
 
-
 sealed class Roots(val route: String) {
     object Auth : Roots("auth")
     object Loading : Roots("loading")

@@ -15,7 +15,6 @@ import kotlinx.serialization.json.Json
 
 val json = Json { }
 
-
 @Serializable
 data class ListState(
     val initialFirstVisibleItemIndex: Int = 0,
@@ -37,6 +36,7 @@ fun rememberLazyListStateSavable(): LazyListState {
         listStateSaver.initialFirstVisibleItemIndex,
         listStateSaver.initialFirstVisibleItemScrollOffset
     )
+
     LaunchedEffect(listState) {
         saveListState(
             ListState(

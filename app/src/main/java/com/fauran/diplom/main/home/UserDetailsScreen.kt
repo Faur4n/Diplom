@@ -34,6 +34,7 @@ import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.rememberPagerState
 import java.util.*
 
+@ExperimentalMaterialApi
 @ExperimentalFoundationApi
 @ExperimentalPagerApi
 @Composable

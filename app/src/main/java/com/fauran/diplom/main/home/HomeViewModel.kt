@@ -92,9 +92,9 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             _state.emit(
                 HomeState(
-                    user = user ?: state?.user,
-                    error = error ?: state?.error,
-                    logout = logout ?: state?.logout ?: false
+                    user = user ?: state.user,
+                    error = error,
+                    logout = logout ?: state.logout
                 )
             )
         }

@@ -1,5 +1,6 @@
 package com.fauran.diplom.auth
 
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.staticCompositionLocalOf
@@ -12,6 +13,7 @@ import com.fauran.diplom.navigation.Roots
 
 val LocalAuthNavController  = staticCompositionLocalOf<NavController?> { null }
 
+@ExperimentalMaterialApi
 @Composable
 fun AuthGraph(){
     val navController = rememberNavController()

@@ -24,9 +24,11 @@ import com.google.android.gms.location.LocationServices
 import com.vk.api.sdk.VK
 import com.vk.api.sdk.VKApiConfig
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 
 val LocalGoogleSignInClient = staticCompositionLocalOf<GoogleSignInClient?> { null }
+
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
@@ -41,6 +43,8 @@ class MainActivity : ComponentActivity() {
         locationProvider
     }
 
+
+    @ExperimentalCoroutinesApi
     @ExperimentalMaterialApi
     @ExperimentalAnimationApi
     @ExperimentalFoundationApi

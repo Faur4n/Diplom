@@ -62,7 +62,6 @@ fun HomeScreen(
     val state by viewModel.state.collectAsState(viewModel.state.value)
     val user = remember(state) { state.user }
 
-
     val isRefreshing by viewModel.isRefreshing.observeAsState(false)
     val sections = remember(user) {
         user?.createSections(context) ?: emptyList()
@@ -74,6 +73,7 @@ fun HomeScreen(
         Log.d(TAG, "MainHomeScreen: friends list $list")
         list?.items?.filterIsInstance<RelatedFriend>() ?: emptyList()
     }
+
     val initialPage = remember(friends) { if (friends.isNotEmpty() && friends.size >= 3) 2 else 0 }
     val pagerState =
         rememberPagerState(friends.size, initialOffscreenLimit = 5, initialPage = initialPage)

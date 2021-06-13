@@ -2,12 +2,12 @@ package com.fauran.diplom.auth.widgets
 
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.Card
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -22,16 +22,17 @@ import com.fauran.diplom.main.vk_api.LocalVkCallback
 import com.fauran.diplom.ui.theme.googleText
 import com.vk.api.sdk.VK
 import com.vk.api.sdk.auth.VKAccessToken
-import com.vk.api.sdk.auth.VKAuthCallback
 import com.vk.api.sdk.auth.VKScope
 
 val vkScopes = listOf(VKScope.FRIENDS, VKScope.WALL, VKScope.AUDIO, VKScope.STATS)
+
+@ExperimentalMaterialApi
 @Composable
 fun VkSignInButton(
     modifier: Modifier = Modifier,
     onResult: (VKAccessToken?) -> Unit,
-    onStart : () -> Unit,
-    onError : (Int) -> Unit,
+    onStart: () -> Unit,
+    onError: (Int) -> Unit,
 
     ) {
     val context = LocalContext.current
@@ -40,23 +41,24 @@ fun VkSignInButton(
 
     Card(
         modifier = modifier
-            .width(220.dp)
-            .clickable {
-                onStart()
-                if (activity != null) {
-                    VK.login(
-                        activity,
-                        vkScopes
-                    )
-                    callback.registerForCallback { token : VKAccessToken?, error : Int? ->
-                        if(token == null && error != null){
-                            onError(error)
-                            return@registerForCallback
-                        }
-                        onResult(token)
+            .width(220.dp),
+        onClick = {
+            onStart()
+            if (activity != null) {
+                VK.login(
+                    activity,
+                    vkScopes
+                )
+                callback.registerForCallback { token: VKAccessToken?, error: Int? ->
+                    if (token == null && error != null) {
+                        onError(error)
+                        return@registerForCallback
                     }
+                    onResult(token)
                 }
-            }) {
+            }
+
+        }) {
         Row(
             modifier = Modifier
                 .padding(8.dp)

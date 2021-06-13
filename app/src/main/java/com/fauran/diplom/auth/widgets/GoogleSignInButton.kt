@@ -1,14 +1,13 @@
 package com.fauran.diplom.auth.widgets
 
-import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.Card
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -20,32 +19,31 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.fauran.diplom.GOOGLE_SIGN_IN
 import com.fauran.diplom.R
-import com.fauran.diplom.TAG
-import com.fauran.diplom.ui.theme.googleText
 import com.fauran.diplom.auth.contracts.GoogleSignInContract
+import com.fauran.diplom.ui.theme.googleText
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.GoogleAuthProvider
 
 
+@ExperimentalMaterialApi
 @Composable
 fun GoogleSignInButton(
     modifier: Modifier,
     onResult: (GoogleSignInAccount?) -> Unit,
-    onStart : () -> Unit,
+    onStart: () -> Unit,
 
     ) {
     val context = LocalContext.current
     val launcher = rememberLauncherForActivityResult(GoogleSignInContract()) { account ->
-       onResult(account)
+        onResult(account)
     }
     Card(
         modifier = modifier
-            .width(220.dp)
-            .clickable {
-                onStart()
-                launcher.launch(GOOGLE_SIGN_IN)
-            }) {
+            .width(220.dp),
+        onClick = {
+            onStart()
+            launcher.launch(GOOGLE_SIGN_IN)
+        }
+    ) {
         Row(
             modifier = Modifier
                 .padding(8.dp)

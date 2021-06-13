@@ -7,10 +7,7 @@ import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.LinearProgressIndicator
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
-import androidx.compose.material.rememberScaffoldState
+import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
@@ -39,6 +36,7 @@ import com.fauran.diplom.ui.theme.*
 import com.fauran.diplom.util.showToast
 import java.util.*
 
+@ExperimentalMaterialApi
 @Composable
 fun AuthScreen(viewModel: AuthViewModel) {
     val context = LocalContext.current
@@ -63,11 +61,8 @@ fun AuthScreen(viewModel: AuthViewModel) {
                 showLoadingDialog = false
             }
             AuthStatus.Success -> {
-                navController?.navigate(Nav.Main.route) {
-                    popUpTo(Nav.Main.route) {
-                        inclusive = true
-                    }
-                }
+                navController?.popBackStack()
+                navController?.navigate(Nav.Main.route)
             }
             AuthStatus.Loading -> {
                 showLoadingDialog = true
@@ -108,7 +103,7 @@ fun AuthScreen(viewModel: AuthViewModel) {
         Column(
             modifier = Modifier
                 .background(
-                    brush = PurpleGradient
+                    brush = defaultThemeColor.gradient
                 )
                 .clipToBounds()
                 .padding(8.dp)

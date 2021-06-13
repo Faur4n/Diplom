@@ -7,6 +7,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
@@ -38,6 +39,7 @@ import com.fauran.diplom.ui.theme.Typography
 import com.fauran.diplom.util.isSpotifyUser
 import com.fauran.diplom.util.isVkUser
 
+@ExperimentalMaterialApi
 @Composable
 fun CardItem(
     user: User?,

@@ -16,23 +16,19 @@ val Green200 = Color(0xFF98ee99)
 val Green500 = Color(0xFF66bb6a)
 val Green700 = Color(0xFF338a3e)
 
-val PurpleGradient = Brush.verticalGradient(
-    colors = listOf(
-        Purple200,
-        Purple500,
-        Purple700
-    )
-)
+val primaryLight = Color(0xffe7b9ff)
+val primary1 = Color(0xffb388ff)
+val primaryDark = Color(0xff805acb)
 
 val defaultThemeColor = ThemeColor(
-    Purple200,
-    Purple500,
-    Purple700,
+    primaryLight,
+    primary1,
+    primaryDark,
     Brush.verticalGradient(
         colors = listOf(
-            Purple200,
-            Purple500,
-            Purple700,
+            primaryLight,
+            primary1,
+            primaryDark,
         )
     )
 )
@@ -40,8 +36,9 @@ val defaultThemeColor = ThemeColor(
 
 
 
+
 val primary = Color(0xFF7b1fa2)
-val primaryDark = Color(0xFF4a0072)
+//val primaryDark = Color(0xFF4a0072)
 val accent = Color(0xFFae52d4)
 val background = Color(0xFFf5f5f5)
 val backgroundGray = Color(0xFFe0e0e0)
