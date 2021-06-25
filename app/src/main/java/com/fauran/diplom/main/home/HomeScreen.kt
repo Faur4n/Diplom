@@ -19,6 +19,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -35,6 +36,8 @@ import com.fauran.diplom.models.RelatedFriend
 import com.fauran.diplom.models.Suggestion
 import com.fauran.diplom.navigation.LocalRootNavController
 import com.fauran.diplom.navigation.Screens
+import com.fauran.diplom.ui.theme.backgroundGray
+import com.fauran.diplom.ui.theme.black
 import com.fauran.diplom.ui.theme.defaultThemeColor
 import com.fauran.diplom.util.ifListOf
 import com.fauran.diplom.util.rememberLazyListStateSavable
@@ -96,26 +99,9 @@ fun HomeScreen(
             navController.navigate(Screens.GenreScreen.route)
         }
     }
-
-
     VKTokenHandler(viewModel = viewModel)
 
-    Scaffold(scaffoldState = scaffoldState, topBar = {
-        TopAppBar(
-            title = { Text(text = stringResource(id = R.string.app_name)) },
-            elevation = 8.dp,
-            actions = {
-                IconButton(onClick = {
-                    viewModel.logout(context, rootNavController)
-                }) {
-                    Icon(
-                        imageVector = Icons.Default.Logout,
-                        contentDescription = null
-                    )
-                }
-            }
-        )
-    }) {
+    Scaffold(scaffoldState = scaffoldState) {
         if (user == null) {
             Box(modifier = Modifier.fillMaxSize()) {
                 Column(modifier = Modifier.align(Alignment.Center)) {
@@ -136,20 +122,20 @@ fun HomeScreen(
                 state = rememberSwipeRefreshState(isRefreshing),
                 onRefresh = {
                     viewModel.refresh()
-                }) {
+                },modifier = Modifier.background(defaultThemeColor.gradient)) {
                 LazyColumn(
                     state = listState,
                     contentPadding = PaddingValues(bottom = 32.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp),
                     modifier = Modifier
-                        .background(
-                            brush = defaultThemeColor.gradient
-                        )
+//                        .background(
+//                            SolidColor(black),
+//                            alpha = .6f
+//                        )
                         .clipToBounds()
                         .fillMaxSize()
                 ) {
                     item {
-                        CardItem(
+                        UserItem(
                             user = user,
                             viewModel,
                         )

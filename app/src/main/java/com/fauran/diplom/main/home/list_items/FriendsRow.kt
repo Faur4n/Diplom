@@ -3,6 +3,7 @@ package com.fauran.diplom.main.home.list_items
 import android.content.Intent
 import android.net.Uri
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -35,6 +36,8 @@ import com.google.accompanist.pager.*
 import kotlin.math.absoluteValue
 
 
+
+
 @ExperimentalMaterialApi
 @ExperimentalPagerApi
 @Composable
@@ -65,7 +68,6 @@ fun FriendsRow(
             shape = RoundedCornerShape(16.dp),
             onClick = {
                 val id = friend.id
-                Log.d(TAG, "FriendsRow: $id")
                 if (id != null) {
                     val launcher = Intent(
                         Intent.ACTION_VIEW,

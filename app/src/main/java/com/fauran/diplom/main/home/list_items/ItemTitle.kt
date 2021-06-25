@@ -9,12 +9,11 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.unit.dp
-import com.fauran.diplom.ui.theme.Typography
-import com.fauran.diplom.ui.theme.defaultThemeColor
-import com.fauran.diplom.ui.theme.white
+import com.fauran.diplom.ui.theme.*
 
 @Composable
 fun ItemTitle(
@@ -24,7 +23,7 @@ fun ItemTitle(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(defaultThemeColor.light)
+            .background(primaryDark)
             .padding(16.dp)
     ) {
 

@@ -12,7 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.fauran.diplom.main.home.utils.Genre
 import com.fauran.diplom.ui.theme.Typography
-import com.fauran.diplom.ui.theme.spotifyBlack
+import com.fauran.diplom.ui.theme.black
 import com.google.accompanist.flowlayout.FlowRow
 
 
@@ -39,7 +39,7 @@ fun GenresItem(
                     }
                     .padding(start = 16.dp,top = 8.dp , end = 16.dp , bottom = 8.dp)
             ) {
-                Text(text = genre.name, style = Typography.subtitle1, color = spotifyBlack)
+                Text(text = genre.name, style = Typography.subtitle1, color = black)
             }
         }
     }

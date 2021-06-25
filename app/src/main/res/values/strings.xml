@@ -5,11 +5,13 @@
     <string name="auth_title">Finder</string>
     <string name="google_sign_in">Войти через Google</string>
     <string name="spotify_sign_in">Войти через Spotify</string>
+    <string name="spotify_sign_in_yes">Spotify подключен</string>
     <string name="vk_sign_in">Войти через VK</string>
+    <string name="vk_sign_in_yes">VK подключен</string>
     <string name="com_spotify_sdk_redirect_scheme">fauran</string>
     <string name="com_spotify_sdk_redirect_host">diplom</string>
     <string name="no_name">Без имени</string>
-    <string name="music_title">Музыка которая может вам понравится</string>
+    <string name="music_title">Музыка которая вам понравится</string>
     <string name="genres_title">Ваши любимые жанры</string>
     <string name="friends_title">Возможно вы знакомы с</string>
     <string name="suggestions_title">Рекомендации</string>
@@ -22,9 +24,17 @@
     <string name="interests_btn_title">Перейти</string>
     <string name="share">Поделиться</string>
     <string name="recommendations">Рекомендации</string>
-    <string name="same_friends">%d общих друзей</string>
     <string name="same_suggestion">%d общих интересов в ВК</string>
     <string name="same_music">%d общих исполнителей</string>
     <string name="more">Подробнее</string>
     <string name="user_title">Пользователь</string>
+    <string name="logout">Выйти</string>
+    <string name="pager_first">Умный поиск людей с близкими интересами.</string>
+    <string name="pager_second">Узнайте, что объединяет вас и ваших друзей.</string>
+
+    <plurals name="same_friends">
+          <item quantity="one">%1$d общий друг</item>
+          <item quantity="few">%1$d общих друга</item>
+          <item quantity="many">%1$d общих друзей</item>
+    </plurals>
 </resources>

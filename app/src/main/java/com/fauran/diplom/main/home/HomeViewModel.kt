@@ -13,6 +13,7 @@ import com.fauran.diplom.local.Preferences.FirebaseToken
 import com.fauran.diplom.local.Preferences.SpotifyToken
 import com.fauran.diplom.local.Preferences.VKToken
 import com.fauran.diplom.local.Preferences.updatePreferences
+import com.fauran.diplom.main.home.recommendations.models.RecommendationUser
 import com.fauran.diplom.main.home.utils.ContextBus
 import com.fauran.diplom.main.home.utils.Genre
 import com.fauran.diplom.main.home.utils.LocationBus
@@ -60,6 +61,18 @@ class HomeViewModel @Inject constructor(
 
     private val _state = MutableStateFlow(HomeState())
     val state = _state.asStateFlow()
+
+    private val _recUsers = MutableSharedFlow<List<RecommendationUser>>(1)
+    val recUsers = _recUsers.asSharedFlow()
+
+
+    fun saveRecUsers(list: List<RecommendationUser>) {
+        viewModelScope.launch {
+            _recUsers.emit(list)
+        }
+    }
+
+    var currentRecUser : User? = null
 
     private val db = Firebase.firestore
     private val auth = Firebase.auth

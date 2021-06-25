@@ -1,14 +1,7 @@
 package com.fauran.diplom.main.home.recommendations
 
 import android.util.Log
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.*
-import androidx.paging.Pager
-import androidx.paging.PagingConfig
-import androidx.paging.PagingData
-import androidx.paging.map
-import com.algolia.instantsearch.core.searchbox.SearchBoxView
 import com.algolia.instantsearch.helper.searcher.SearcherSingleIndex
 import com.algolia.search.client.ClientSearch
 import com.algolia.search.helper.deserialize
@@ -18,7 +11,6 @@ import com.algolia.search.model.IndexName
 import com.algolia.search.model.search.Query
 import com.fauran.diplom.BuildConfig
 import com.fauran.diplom.TAG
-import com.fauran.diplom.main.home.recommendations.models.Intersection
 import com.fauran.diplom.main.home.recommendations.models.RecData
 import com.fauran.diplom.main.home.recommendations.models.RecommendationUser
 import com.fauran.diplom.models.User
@@ -26,14 +18,13 @@ import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.firestore.ktx.toObject
 import com.google.firebase.ktx.Firebase
 import io.ktor.client.features.logging.*
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
 
 class RecommendationViewModelFactory(
     val user: User?
-) : ViewModelProvider.Factory{
+) : ViewModelProvider.Factory {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
         return modelClass.getConstructor(User::class.java).newInstance(user)
     }
@@ -41,7 +32,7 @@ class RecommendationViewModelFactory(
 }
 
 class RecommendationViewModel(
-    val user: User?
+    val user: User?,
 ) : ViewModel() {
 
     private val store = Firebase.firestore
@@ -52,21 +43,19 @@ class RecommendationViewModel(
         LogLevel.ALL
     )
 
-    private val _users = MutableLiveData<List<User>>()
-    val users: LiveData<List<User>> = _users
-
     private val index = client.initIndex(IndexName("finder"))
     private val searcher = SearcherSingleIndex(
         index, query = Query(
-            aroundLatLngViaIP = true
+//            aroundLatLngViaIP = true
         )
     )
     val hitsPager = SearcherSingleIndexPager(
         searcher = searcher,
-        transformer = { response ->
+        serializer = { response ->
             response.hits.deserialize(RecData.serializer()).mapNotNull {
                 val newUser = getUser(it.id) ?: return@mapNotNull null
-                val intersections = RecUtils.findIntersections(newUser,user)
+                if (newUser.gkey == user?.gkey) return@mapNotNull null
+                val intersections = RecUtils.findIntersections(newUser, user)
                 RecommendationUser(
                     newUser,
                     intersections
@@ -77,17 +66,15 @@ class RecommendationViewModel(
 
     init {
         viewModelScope.launch {
-            searcher.setQuery("rock")
+//            searcher.setQuery("")
 //            delay(5000)
 //            searcher.setQuery("кирилл")
 //            hitsPager.notifySearcherChanged()
         }
     }
 
-    suspend fun getUser(id: String): User? {
-        Log.d(TAG, "getUser: USER WITH ID $id")
+    private suspend fun getUser(id: String): User? {
         val user = store.document("users/$id").get().await().toObject<User>()
-        Log.d(TAG, "getUser: $user")
         return user
     }
 
@@ -100,16 +87,10 @@ class RecommendationViewModel(
                     cities.add(city)
                 }
             }
+
             Log.d(TAG, "getCategories: $cities")
         }
     }
-
-//    suspend fun getUser(id: String){
-//        store.document("users/$id").get()
-//            .addOnSuccessListener {
-//                val user = it.toObject<User>()
-//            }
-//    }
 
     override fun onCleared() {
         super.onCleared()

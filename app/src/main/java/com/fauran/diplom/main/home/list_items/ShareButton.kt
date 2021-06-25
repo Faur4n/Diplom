@@ -13,7 +13,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.fauran.diplom.R
 import com.fauran.diplom.ui.theme.Typography
-import com.fauran.diplom.ui.theme.spotifyBlack
+import com.fauran.diplom.ui.theme.black
 import com.fauran.diplom.ui.theme.spotifyGreen
 import com.fauran.diplom.ui.theme.white
 
@@ -29,7 +29,7 @@ fun ShareButton(
                 text = if (shared) stringResource(id = R.string.interests_title) else stringResource(
                     id = R.string.share_you_interests
                 ),
-                color = if(shared) spotifyGreen else spotifyBlack,
+                color = if(shared) spotifyGreen else black,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.padding(16.dp)
             )

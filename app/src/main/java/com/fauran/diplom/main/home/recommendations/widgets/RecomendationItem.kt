@@ -112,13 +112,15 @@ fun SameMusicRow(
         verticalAlignment = Alignment.CenterVertically
     ) {
         item{
-            Text(text = stringResource(id = R.string.same_music,music.size),modifier = Modifier.fillMaxWidth())
-            Spacer(modifier = Modifier.size(16.dp))
+            Text(text = stringResource(id = R.string.same_music,music.size),modifier = Modifier.fillMaxWidth()
+                .padding(start = 8.dp)
+            )
+            Spacer(modifier = Modifier.size(32.dp))
 
         }
         items(music) {
             val paint =
-                rememberCoilPainter(request = it.imageUrl, requestBuilder = {
+                rememberCoilPainter(request = it.imageUrl?.firstOrNull(), requestBuilder = {
                     transformations(CircleCropTransformation())
                 })
             Image(
@@ -135,15 +137,16 @@ fun SameFriendsRow(
     friends: List<RelatedFriend>,
     modifier: Modifier = Modifier
 ) {
+
+    val resources = LocalContext.current.resources
     LazyRow(
         horizontalArrangement = Arrangement.spacedBy((-16).dp),
         modifier = modifier,
         verticalAlignment = Alignment.CenterVertically
     ) {
         item{
-            Text(text = stringResource(id = R.string.same_friends,friends.size),modifier = Modifier.fillMaxWidth())
-            Spacer(modifier = Modifier.size(16.dp))
-
+            Text(text = resources.getQuantityString(R.plurals.same_friends,friends.size,friends.size),modifier = Modifier.fillMaxWidth())
+            Spacer(modifier = Modifier.size(32.dp))
         }
         items(friends) { item ->
             val paint =

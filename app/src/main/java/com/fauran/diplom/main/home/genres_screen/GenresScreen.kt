@@ -36,7 +36,7 @@ import com.fauran.diplom.main.home.list_items.ItemTitle
 import com.fauran.diplom.models.SpotifyArtist
 import com.fauran.diplom.ui.theme.Typography
 import com.fauran.diplom.ui.theme.defaultThemeColor
-import com.fauran.diplom.ui.theme.spotifyBlack
+import com.fauran.diplom.ui.theme.black
 import com.fauran.diplom.ui.theme.white
 import com.google.accompanist.coil.rememberCoilPainter
 import kotlinx.coroutines.flow.filterNotNull
@@ -131,7 +131,7 @@ fun ArtistItem(artist: SpotifyArtist, modifier: Modifier = Modifier) {
     Row(
         modifier = modifier
             .fillMaxSize()
-            .background(SolidColor(spotifyBlack), alpha = 0.5f)
+            .background(SolidColor(black), alpha = 0.5f)
             .clickable {
                 val launcher = Intent(Intent.ACTION_VIEW, Uri.parse(artist.uri))
                 context.startActivity(launcher)

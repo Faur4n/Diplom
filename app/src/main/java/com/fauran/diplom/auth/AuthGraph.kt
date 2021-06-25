@@ -10,9 +10,11 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.fauran.diplom.navigation.Roots
+import com.google.accompanist.pager.ExperimentalPagerApi
 
 val LocalAuthNavController  = staticCompositionLocalOf<NavController?> { null }
 
+@ExperimentalPagerApi
 @ExperimentalMaterialApi
 @Composable
 fun AuthGraph(){

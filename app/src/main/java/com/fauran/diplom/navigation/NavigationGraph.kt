@@ -16,7 +16,6 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.fauran.diplom.TAG
 import com.fauran.diplom.auth.AuthGraph
-import com.fauran.diplom.main.MainGraph
 import com.fauran.diplom.splash.SplashScreen
 import com.fauran.diplom.splash.SplashViewModel
 import com.google.accompanist.pager.ExperimentalPagerApi

@@ -24,14 +24,9 @@ import androidx.paging.*
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.algolia.instantsearch.helper.searcher.SearcherSingleIndex
-import com.algolia.search.helper.deserialize
 import com.algolia.search.model.response.ResponseSearch
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -73,13 +68,13 @@ public data class SearcherLazyPaging<T : Any>(
 public class SearcherSingleIndexPager<T : Any>(
     searcher: SearcherSingleIndex,
     pagingConfig: PagingConfig = PagingConfig(pageSize = 10),
-    transformer: suspend (ResponseSearch) -> List<T>
+    serializer: suspend (ResponseSearch) -> List<T>,
 ) : SearcherPager<T> {
 
     override val flow: Flow<PagingData<T>> = Pager(pagingConfig) {
         SearcherSingleIndexPagingSource(
             searcher = searcher,
-            transformer = transformer
+            transformer = serializer
         )
     }.flow
 

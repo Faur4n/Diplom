@@ -10,6 +10,7 @@ import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.SpeakerGroup
 import androidx.compose.material.icons.sharp.Audiotrack
 import androidx.compose.material.icons.sharp.ContactSupport
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.fauran.diplom.R
@@ -153,3 +154,4 @@ class LocationBus {
         }
     }
 }
+

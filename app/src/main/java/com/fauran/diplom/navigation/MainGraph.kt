@@ -1,12 +1,10 @@
 package com.fauran.diplom.navigation
 
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
@@ -29,14 +27,14 @@ import com.fauran.diplom.main.home.HomeScreen
 import com.fauran.diplom.main.home.HomeViewModel
 import com.fauran.diplom.main.home.genres_screen.GenresScreen
 import com.fauran.diplom.main.home.recommendations.RecommendationScreen
-import com.fauran.diplom.navigation.LocalRootNavController
-import com.fauran.diplom.navigation.Roots
-import com.fauran.diplom.navigation.Screens
+import com.fauran.diplom.main.home.recommendations.RecommendationUserScreen
+import com.fauran.diplom.ui.theme.primaryDark
 import com.fauran.diplom.util.rememberLazyListStateSavable
 import com.google.accompanist.pager.ExperimentalPagerApi
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 val LocalMainNavController = staticCompositionLocalOf<NavController?> { null }
+val LocalRecNavController = staticCompositionLocalOf<NavController?> { null }
 
 val bottomNavigationItems = listOf(
     BottomNavItem(
@@ -50,7 +48,7 @@ val bottomNavigationItems = listOf(
 )
 
 data class BottomNavItem(
-    val route : String, val icon : ImageVector
+    val route: String, val icon: ImageVector
 )
 
 @Composable
@@ -84,7 +82,8 @@ fun MainGraph() {
     val rootNavController = LocalRootNavController.current
     val context = LocalContext.current
 
-    val viewModel: HomeViewModel? = rootNavController?.currentBackStackEntry?.let { hiltViewModel(it) }
+    val viewModel: HomeViewModel? =
+        rootNavController?.currentBackStackEntry?.let { hiltViewModel(it) }
     val spotifyHandler =
         rememberLauncherForActivityResult(contract = SpotifySignInContract()) {
             viewModel?.connectSpotify(context, it)
@@ -103,15 +102,20 @@ fun MainGraph() {
         val homeState = rememberSaveable(saver = NavStateSaver) {
             mutableStateOf(Bundle())
         }
+        val recState = rememberSaveable(saver = NavStateSaver) {
+            mutableStateOf(Bundle())
+        }
+
 
         Scaffold(bottomBar = {
             val currentScreen by navController.currentBackStackEntryAsState()
-            BottomNavigation() {
+            BottomNavigation(backgroundColor = primaryDark) {
                 bottomNavigationItems.forEach { item ->
                     BottomNavigationItem(
                         selected = currentScreen?.destination?.route == item.route,
                         onClick = {
-                            navController.navigate(item.route)
+                            if (item.route != currentScreen?.destination?.route)
+                                navController.navigate(item.route)
                         },
                         icon = {
                             val paint = rememberVectorPainter(image = item.icon)
@@ -121,17 +125,25 @@ fun MainGraph() {
             }
         }) {
             val listState = rememberLazyListStateSavable()
-            NavHost(navController = navController, startDestination = Roots.Home.route,modifier = Modifier.padding(it)) {
+            NavHost(
+                navController = navController,
+                startDestination = Roots.Home.route,
+                modifier = Modifier.padding(it)
+            ) {
                 composable(Roots.Home.route) {
                     val homeNavController = rememberNavController()
-                    NavStateController(homeState,homeNavController){
+                    NavStateController(homeState, homeNavController) {
                         NavHost(
                             navController = homeNavController,
                             startDestination = Screens.HomeScreen.route
                         ) {
                             composable(Screens.HomeScreen.route) {
                                 if (viewModel != null) {
-                                    HomeScreen(viewModel = viewModel,navController = homeNavController,listState)
+                                    HomeScreen(
+                                        viewModel = viewModel,
+                                        navController = homeNavController,
+                                        listState
+                                    )
                                 }
                             }
                             composable(Screens.GenreScreen.route) {
@@ -144,10 +156,33 @@ fun MainGraph() {
 
                 }
                 composable(Roots.Recommendations.route) {
-                    if (viewModel != null) {
-                        RecommendationScreen(
-                            viewModel,
-                        )
+                    val recNavController = rememberNavController()
+                    CompositionLocalProvider(
+                        LocalRecNavController provides recNavController
+                    ) {
+                        NavStateController(navState = recState, navController = recNavController) {
+                            NavHost(
+                                navController = recNavController,
+                                startDestination = Screens.RecommendationScreen.route
+                            ) {
+                                composable(Screens.RecommendationScreen.route) {
+                                    if (viewModel != null) {
+                                        RecommendationScreen(
+                                            recNavController,
+                                            viewModel,
+                                        )
+                                    }
+                                }
+                                composable(Screens.RecUserScreen.route) {
+                                    val user = viewModel?.currentRecUser
+                                    if (user != null) {
+                                        RecommendationUserScreen(recNavController, user)
+                                    } else {
+                                        recNavController.popBackStack()
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }

@@ -168,7 +168,7 @@ data class MusicData(
     var name: String? = null,
     @get:PropertyName("image_url")
     @set:PropertyName("image_url")
-    var imageUrl: String? = null,
+    var imageUrl: List<String?>? = null,
     @get:PropertyName("uri")
     @set:PropertyName("uri")
     var uri: String? = null,
@@ -189,7 +189,7 @@ data class SpotifyTopArtistsItem(
         return MusicData(
             genres = genres,
             name = name,
-            imageUrl = images?.firstOrNull()?.url,
+            imageUrl = images?.map { it.url },
             uri = uri
         )
     }
