@@ -25,7 +25,6 @@
     <string name="share">Поделиться</string>
     <string name="recommendations">Рекомендации</string>
     <string name="same_suggestion">%d общих интересов в ВК</string>
-    <string name="same_music">%d общих исполнителей</string>
     <string name="more">Подробнее</string>
     <string name="user_title">Пользователь</string>
     <string name="logout">Выйти</string>
@@ -36,5 +35,17 @@
           <item quantity="one">%1$d общий друг</item>
           <item quantity="few">%1$d общих друга</item>
           <item quantity="many">%1$d общих друзей</item>
+    </plurals>
+
+    <plurals name="same_music">
+        <item quantity="one">%1$d общий исполнитель</item>
+        <item quantity="few">%1$d общих исполнителя</item>
+        <item quantity="many">%1$d общих исполнителей</item>
+    </plurals>
+
+    <plurals name="years">
+        <item quantity="one">%1$d год</item>
+        <item quantity="few">%1$d года</item>
+        <item quantity="many">%1$d лет</item>
     </plurals>
 </resources>

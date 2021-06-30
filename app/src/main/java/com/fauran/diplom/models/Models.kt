@@ -117,7 +117,13 @@ data class RelatedFriend(
     var interests: String? = null,
     @get:PropertyName("id")
     @set:PropertyName("id")
-    var id: String? = null
+    var id: String? = null,
+    @get:PropertyName("age")
+    @set:PropertyName("age")
+    var age: Int? = null,
+    @get:PropertyName("about")
+    @set:PropertyName("about")
+    var about: String? = null,
 ) : BaseSection()
 data class SearchableFriend(
     @get:PropertyName("firstName")

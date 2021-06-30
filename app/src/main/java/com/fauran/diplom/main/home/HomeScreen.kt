@@ -20,6 +20,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.layout.ScaleFactor
+import androidx.compose.ui.layout.lerp
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -28,6 +31,8 @@ import androidx.navigation.NavController
 import com.fauran.diplom.R
 import com.fauran.diplom.TAG
 import com.fauran.diplom.main.home.list_items.*
+import com.fauran.diplom.main.home.recommendations.widgets.FriendsItem
+import com.fauran.diplom.main.home.recommendations.widgets.NewFriendsRow
 import com.fauran.diplom.main.home.utils.Genre
 import com.fauran.diplom.main.home.utils.createSections
 import com.fauran.diplom.main.vk_api.VKTokenHandler
@@ -41,14 +46,14 @@ import com.fauran.diplom.ui.theme.black
 import com.fauran.diplom.ui.theme.defaultThemeColor
 import com.fauran.diplom.util.ifListOf
 import com.fauran.diplom.util.rememberLazyListStateSavable
-import com.google.accompanist.pager.ExperimentalPagerApi
-import com.google.accompanist.pager.rememberPagerState
+import com.google.accompanist.pager.*
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import kotlin.math.absoluteValue
 
 @ExperimentalMaterialApi
 @ExperimentalPagerApi
@@ -177,8 +182,9 @@ fun HomeScreen(
                         }
                         items.ifListOf<RelatedFriend> { friends ->
                             item {
-                                FriendsRow(friends = friends, pagerState)
+                                NewFriendsRow(pagerState = pagerState, items = friends)
                             }
+
                         }
                         items.ifListOf<Suggestion> { suggestions ->
                             items(suggestions) {

@@ -72,7 +72,7 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    var currentRecUser : User? = null
+    var currentRecUser : RecommendationUser? = null
 
     private val db = Firebase.firestore
     private val auth = Firebase.auth

@@ -8,6 +8,13 @@ import com.fauran.diplom.local.Preferences.updatePreferences
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 
+inline fun <T> tryOrNull(action: () -> T) =
+    try {
+        action()
+    } catch (_: Exception) {
+        null
+    }
+
 
 fun Context.showToast(msg : String){
     Toast.makeText(this,msg,Toast.LENGTH_SHORT).show()

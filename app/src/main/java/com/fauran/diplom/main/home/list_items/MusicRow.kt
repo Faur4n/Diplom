@@ -45,7 +45,6 @@ fun MusicItem(
             animationSpec = tween(300, easing = LinearEasing)
         )
     }
-
     val context = LocalContext.current
     Box(
         modifier = modifier

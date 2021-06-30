@@ -4,7 +4,7 @@ import android.util.Log
 import com.fauran.diplom.TAG
 import com.fauran.diplom.main.vk_api.VkApi
 import com.fauran.diplom.main.vk_api.VkApi.toRelatedFriends
-import com.fauran.diplom.main.vk_api.VkApi.toSuggestion
+import com.fauran.diplom.main.vk_api.VkApi.toSuggestions
 import com.fauran.diplom.models.*
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
@@ -22,7 +22,7 @@ class HomeUseCase @Inject constructor() {
             val suggestion = getSuggestions()
 
             val friends = getFriendsData()
-
+            Log.d(TAG, "updateVkData: $friends")
             if (user != null) {
                 val newUser = user.copy(
                     friends = friends,
@@ -56,8 +56,8 @@ class HomeUseCase @Inject constructor() {
         return VkApi.getRelatedFriends().items.map { it.toRelatedFriends() }
     }
 
-    private suspend fun getSuggestions(): List<Suggestion>? {
-        return VkApi.getNewsSuggestions().items?.map { it.toSuggestion() }
+    private suspend fun getSuggestions(): List<Suggestion> {
+        return VkApi.getNewsSuggestions().toSuggestions()
     }
 
     private suspend fun saveUser(user: User) {

@@ -106,7 +106,7 @@ fun RecommendationList(
     modifier: Modifier = Modifier,
     searcherLazyPaging: SearcherLazyPaging<RecommendationUser>,
     oldItems : List<RecommendationUser>,
-    onDetailsClick: (User) -> Unit,
+    onDetailsClick: (RecommendationUser) -> Unit,
     onSave: (List<RecommendationUser>) -> Unit
 ) {
     val (data, state) = searcherLazyPaging
@@ -120,7 +120,7 @@ fun RecommendationList(
         LazyColumn(modifier, state) {
             items(data) { item ->
                 RecommendationItem(recUser = item) { id ->
-                    item?.user?.let { it -> onDetailsClick(it) }
+                    item?.let { it -> onDetailsClick(it) }
                 }
             }
         }
@@ -128,7 +128,7 @@ fun RecommendationList(
         LazyColumn(modifier, state) {
             items(oldItems) { item ->
                 RecommendationItem(recUser = item) { id ->
-                    onDetailsClick(item.user)
+                    onDetailsClick(item)
                 }
             }
         }

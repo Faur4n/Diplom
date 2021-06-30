@@ -4,6 +4,7 @@ import android.util.Log
 import com.fauran.diplom.TAG
 import com.fauran.diplom.models.RelatedFriend
 import com.fauran.diplom.models.Suggestion
+import com.fauran.diplom.util.tryOrNull
 import com.vk.api.sdk.VK
 import com.vk.api.sdk.VKApiCallback
 import com.vk.sdk.api.base.dto.BaseUserGroupFields
@@ -12,12 +13,13 @@ import com.vk.sdk.api.friends.dto.FilterParam
 import com.vk.sdk.api.friends.dto.FriendsGetSuggestionsResponse
 import com.vk.sdk.api.friends.dto.NameCaseParam
 import com.vk.sdk.api.newsfeed.NewsfeedService
-import com.vk.sdk.api.newsfeed.dto.NewsfeedGetSuggestedSourcesResponse
+import com.vk.sdk.api.newsfeed.dto.NewsfeedGetRecommendedResponse
 import com.vk.sdk.api.users.UsersService
 import com.vk.sdk.api.users.dto.UsersFields
-import com.vk.sdk.api.users.dto.UsersSubscriptionsItem
 import com.vk.sdk.api.users.dto.UsersUserFull
 import com.vk.sdk.api.users.dto.UsersUserXtrCounters
+import java.text.SimpleDateFormat
+import java.util.*
 import kotlin.coroutines.suspendCoroutine
 import kotlin.random.Random
 
@@ -65,6 +67,8 @@ object VkApi {
                         UsersFields.DOMAIN,
                         UsersFields.INTERESTS,
                         UsersFields.SEX,
+                        UsersFields.ABOUT,
+                        UsersFields.BDATE
                     ),
                     nameCase = NameCaseParam.ACCUSATIVE
                 ), object : VKApiCallback<FriendsGetSuggestionsResponse> {
@@ -79,7 +83,38 @@ object VkApi {
             )
         }
 
+    private fun getAge(date: Date): Int {
+        val dob = Calendar.getInstance()
+        val today = Calendar.getInstance()
+        dob.time = date
+
+        var age = today.get(Calendar.YEAR) - dob.get(Calendar.YEAR)
+
+        if (today.get(Calendar.DAY_OF_YEAR) < dob.get(Calendar.DAY_OF_YEAR)) {
+            age--
+        }
+
+        val ageInt = age
+
+        return ageInt
+    }
+
     fun UsersUserFull.toRelatedFriends(): RelatedFriend {
+        Log.d(TAG, "toRelatedFriends: $bdate")
+        val bdate = bdate
+        var age =
+            if (bdate != null) {
+                val date = tryOrNull {
+                    SimpleDateFormat("d.m.yyyy", Locale.getDefault()).parse(bdate)
+                }
+                if (date != null) {
+                    getAge(date)
+                } else null
+
+            } else null
+
+
+
         return RelatedFriend(
             firstName = firstNameNom,
             lastName = lastNameNom,
@@ -89,17 +124,19 @@ object VkApi {
             photo = photo200Orig,
             domain = domain,
             interests = interests,
-            id = id?.toString()
+            id = id?.toString(),
+            about = about,
+            age = age
         )
+
 
     }
 
     suspend fun getNewsSuggestions() =
-        suspendCoroutine<NewsfeedGetSuggestedSourcesResponse> { continuation ->
+        suspendCoroutine<NewsfeedGetRecommendedResponse> { continuation ->
             VK.execute(
-                NewsfeedService().newsfeedGetSuggestedSources(
+                NewsfeedService().newsfeedGetRecommended(
                     count = 50,
-                    shuffle = true,
                     fields = listOf(
                         BaseUserGroupFields.ABOUT,
                         BaseUserGroupFields.NAME,
@@ -113,41 +150,69 @@ object VkApi {
                         BaseUserGroupFields.COUNTRY,
                         BaseUserGroupFields.COMMON_COUNT
                     )
-                ), object : VKApiCallback<NewsfeedGetSuggestedSourcesResponse> {
+                ), object : VKApiCallback<NewsfeedGetRecommendedResponse> {
                     override fun fail(error: Exception) {
                         continuation.resumeWith(Result.failure(error))
                     }
 
-                    override fun success(result: NewsfeedGetSuggestedSourcesResponse) {
+                    override fun success(result: NewsfeedGetRecommendedResponse) {
                         continuation.resumeWith(Result.success(result))
                     }
                 })
         }
 
 
-    fun UsersSubscriptionsItem.toSuggestion(): Suggestion {
-        return when (this) {
-            is UsersSubscriptionsItem.UsersUserXtrType -> {
-                Suggestion(
-                    firstName = firstName,
-                    lastName = lastName,
-                    id = id?.toString(),
-                    type = type?.name,
-                    screenName = screenName,
-                    photo = photo100
+    fun NewsfeedGetRecommendedResponse.toSuggestions(): List<Suggestion> {
+        Log.d(TAG, "toSuggestions: ${this.groups}")
+        Log.d(TAG, "toSuggestions: ${this.profiles}")
+        val groups = (groups ?: emptyList()).asSequence().map { group ->
+            Suggestion(
+                name = group.name,
+                description = group.description,
+                city = group.country?.title,
+                id = group.id?.toString(),
+                type = group.type?.name,
+                photo = group.photo200,
+                screenName = group.screenName,
+
                 )
-            }
-            is UsersSubscriptionsItem.GroupsGroupFull -> {
-                Suggestion(
-                    city = city?.title,
-                    description = description,
-                    id = id?.toString(),
-                    name = name,
-                    type = type?.name,
-                    photo = photo200
-                )
-            }
-        }
+        }.shuffled()
+        val profiles = (profiles ?: emptyList()).asSequence().map { profile ->
+            Suggestion(
+                firstName = profile.firstName,
+                city = profile.city?.title,
+                photo = profile.photo200,
+                lastName = profile.lastName,
+                type = profile.type?.name,
+                id = profile.id?.toString(),
+                screenName = profile.screenName,
+                description = profile.serviceDescription,
+            )
+        }.shuffled()
+        return (groups + profiles).shuffled().toList()
+
+//        return when (this) {
+//            is UsersSubscriptionsItem.UsersUserXtrType -> {
+//                Suggestion(
+//                    firstName = firstName,
+//                    lastName = lastName,
+//                    id = id?.toString(),
+//                    type = type?.name,
+//                    screenName = screenName,
+//                    photo = photo100
+//                )
+//            }
+//            is UsersSubscriptionsItem.GroupsGroupFull -> {
+//                Suggestion(
+//                    city = city?.title,
+//                    description = description,
+//                    id = id?.toString(),
+//                    name = name,
+//                    type = type?.name,
+//                    photo = photo200
+//                )
+//            }
+//        }
     }
 
 

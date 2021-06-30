@@ -39,16 +39,18 @@ val LocalRecNavController = staticCompositionLocalOf<NavController?> { null }
 val bottomNavigationItems = listOf(
     BottomNavItem(
         Roots.Home.route,
-        Icons.Default.Home
+        Icons.Default.Home,
+        "Профиль"
     ),
     BottomNavItem(
         Roots.Recommendations.route,
-        Icons.Default.Recommend
+        Icons.Default.Recommend,
+        "Рекомендаци"
     )
 )
 
 data class BottomNavItem(
-    val route: String, val icon: ImageVector
+    val route: String, val icon: ImageVector, val title : String
 )
 
 @Composable
@@ -106,12 +108,14 @@ fun MainGraph() {
             mutableStateOf(Bundle())
         }
 
-
         Scaffold(bottomBar = {
             val currentScreen by navController.currentBackStackEntryAsState()
             BottomNavigation(backgroundColor = primaryDark) {
                 bottomNavigationItems.forEach { item ->
                     BottomNavigationItem(
+                        label = {
+                            Text(item.title)
+                        },
                         selected = currentScreen?.destination?.route == item.route,
                         onClick = {
                             if (item.route != currentScreen?.destination?.route)

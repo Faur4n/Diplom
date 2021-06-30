@@ -32,7 +32,6 @@ fun RecommendationItem(
     onDetailsClick : (isUser : String) -> Unit,
 ) {
     val context = LocalContext.current
-
     Card(
         Modifier.padding(8.dp),
     ) {
@@ -106,13 +105,15 @@ fun SameMusicRow(
     music: List<MusicData>,
     modifier: Modifier = Modifier
 ) {
+    val resources = LocalContext.current.resources
+
     LazyRow(
         horizontalArrangement = Arrangement.spacedBy((-16).dp),
         modifier = modifier,
         verticalAlignment = Alignment.CenterVertically
     ) {
         item{
-            Text(text = stringResource(id = R.string.same_music,music.size),modifier = Modifier.fillMaxWidth()
+            Text(text = resources.getQuantityString(R.plurals.same_music,music.size,music.size),modifier = Modifier.fillMaxWidth()
                 .padding(start = 8.dp)
             )
             Spacer(modifier = Modifier.size(32.dp))
